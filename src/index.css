@@ -1,0 +1,31 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+
+
+body {
+  overflow-x: hidden;
+  background-color: black;
+  color:white;
+}
+
+/* Disable resizing */
+textarea {
+  resize: none;
+}
+
+
+.links {
+  @apply  text-2xl relative right-5 p-2 pl-4 bottom-3 hover:font-semibold w-40 text-center h-12 cursor-pointer
+  hover:transition-colors  hover:duration-500 hover:ease-in-out hover:bg-gray-700 hover:rounded-full
+}
+
+.burger-links {
+  @apply font-serif  relative left-2 text-base
+}
+
+.input {
+  @apply border-b-1 border-black border-collapse outline-none bg-black
+}
+
