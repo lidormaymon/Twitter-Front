@@ -1,37 +1,37 @@
 import { RootState } from '../../app/store';
-import { createAsyncThunk, createSlice} from '@reduxjs/toolkit';
-import {  postLike, post, getTweetsPage, nextPageTweets, queryLikes } from './tweetAPI'
+import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
+import { postLike, post, fetchTweetsPage, nextPageTweets, queryLikes, removeLike, fetchLikes } from './tweetAPI'
 
 export interface TweetsTemp {
-    id:number,
-    created_time:string,
-    user_id:number,
-    comments:number,
-    likes:number
-    text:string
+    id: number,
+    created_time: string,
+    user_id: number,
+    comments: number,
+    likes: number
+    text: string
+    liked_by_me: boolean
 }
 export interface TweetsLikeTemp {
-    id:number,
-    user_id:number,
-    tweet_id:number,
-    liked_by_me:boolean,
-    created_time:string
+    id: number,
+    user: number,
+    tweet: number,
+    created_time: string
 }
 
 
 export interface Tweets {
-    TweetsAR:TweetsTemp[]
-    likesAR:TweetsLikeTemp[]
+    TweetsAR: TweetsTemp[]
+    likesAR: TweetsLikeTemp[]
 }
 
 const initialState: Tweets = {
-    TweetsAR:[],
-    likesAR:[]
+    TweetsAR: [],
+    likesAR: []
 }
 
 export const postTweetData = createAsyncThunk(
     'tweet/post',
-    async(data:any) => {
+    async (data: any) => {
         const response = await post(data.text, data.user_id)
         return response.data
     }
@@ -39,34 +39,50 @@ export const postTweetData = createAsyncThunk(
 
 export const getTweets = createAsyncThunk(
     'tweet/get',
-    async() => {
-        const response = await getTweetsPage()
+    async () => {
+        const response = await fetchTweetsPage()
         return response.data
     }
 )
 
 export const nextPage = createAsyncThunk(
     'tweet/nextPage',
-    async(page:number) => {
+    async (page: number) => {
         const response = await nextPageTweets(page)
-        console.log(response.data,'twiterrr');
+        console.log(response.data, 'twiterrr');
+        return response.data
+    }
+)
+
+export const getLikes = createAsyncThunk(
+    'getLikes/likes',
+    async () => {
+        const response = await fetchLikes()
         return response.data
     }
 )
 
 export const likeTweet = createAsyncThunk(
     'tweet/like',
-    async(data:any) => {
-        const response = await postLike(data.user_id, data.tweet_id, data.likes)
+    async (data: any) => {
+        const response = await postLike(data.BrowsingUserID, data.tweet_id, data.likes)
         return response
     }
 )
 
 export const query_likes = createAsyncThunk(
     'query/like',
-    async(data:any) => {
-        const response = await queryLikes(data.user_id, data.tweet_id)
+    async (data: any) => {
+        const response = await queryLikes(data.BrowsingUserID, data.tweet_id)
         return response.data
+    }
+)
+
+export const undoLike = createAsyncThunk(
+    'delete/like',
+    async (data: any) => {
+        const response = await removeLike(data.likeID, data.tweet_id, data.likes)
+        return response
     }
 )
 
@@ -80,26 +96,51 @@ export const tweetSlice = createSlice({
     },
     extraReducers: (builder) => {
         builder
-            .addCase(getTweets.fulfilled, ( state, action) => {
-                state.TweetsAR = action.payload
-                console.log(state.TweetsAR);
-                
+            .addCase(getTweets.fulfilled, (state, action) => {
+                state.TweetsAR = action.payload          
             })
         builder
             .addCase(nextPage.fulfilled, (state, action) => {
                 state.TweetsAR.push(...action.payload)
-                console.log(state.TweetsAR);
-                
             })
         builder
-            .addCase(likeTweet.fulfilled, (state, action) => {  
-                const updatedLikeResponse = action.payload.incrementResponse.data;
+            .addCase(getLikes.fulfilled, ( state, action) => {
+                state.likesAR = action.payload
+            })
+        builder
+            .addCase(likeTweet.fulfilled, (state, action) => {
+                const updatedLikeResponse = action.payload.incrementResponse.data
+                
                 const likedTweetIndex = state.TweetsAR.findIndex(
                     tweet => tweet.id === updatedLikeResponse.id
                 )
                 if (likedTweetIndex !== -1) {
-                    console.log('works');       
-                    state.TweetsAR[likedTweetIndex].likes = updatedLikeResponse.likes;
+                    state.TweetsAR[likedTweetIndex].likes = updatedLikeResponse.likes
+                    state.TweetsAR[likedTweetIndex].liked_by_me = true
+                    state.likesAR = action.payload.likeResponse.data          
+                }
+            })
+        builder
+            .addCase(undoLike.fulfilled, (state, action) => {
+                const updatedLikeResponse = action.payload.decremenetLikesResponse.data
+                const likedTweetIndex = state.TweetsAR.findIndex(
+                    tweet => tweet.id === updatedLikeResponse.id
+                )
+                if (likedTweetIndex !== -1) {
+
+                    state.TweetsAR[likedTweetIndex].likes = updatedLikeResponse.likes
+                }
+            })
+        builder
+            .addCase(query_likes.fulfilled, (state, action) => {
+                const updatedLikeResponse = action.payload
+                const likedTweetIndex = state.TweetsAR.findIndex(
+                    tweet => tweet.id === updatedLikeResponse.tweet_id
+                ) 
+                const likeExists = updatedLikeResponse['like_exists'];
+                if (likeExists === true) {
+                    state.TweetsAR[likedTweetIndex].liked_by_me = likeExists;
+
                 }
             })
     }
@@ -107,4 +148,5 @@ export const tweetSlice = createSlice({
 
 
 export const selectTweets = (state: RootState) => state.tweet.TweetsAR
+export const selectLikes = ( state: RootState) => state.tweet.likesAR
 export default tweetSlice.reducer

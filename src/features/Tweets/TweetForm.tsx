@@ -6,7 +6,7 @@ import VerifiedIcon from '@mui/icons-material/Verified';
 import { formatDistanceToNow, parseISO } from 'date-fns';
 import { useAppDispatch, useAppSelector } from "../../app/hooks";
 import { selectUserData, selectUsers } from "../auth/authSlice";
-import { likeTweet, query_likes } from "./tweetSlice";
+import { likeTweet, query_likes, undoLike, selectLikes, getLikes } from "./tweetSlice";
 import { useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 
@@ -18,75 +18,88 @@ interface TweetFormProps {
     comments: number,
     likes: number,
     text: string,
-    user_id: number
+    user_id: number,
+    liked_by_me:boolean
   },
 }
 
 
 const TweetForm: React.FC<TweetFormProps> = ({ tweet_data }) => {
   const users = useAppSelector(selectUsers)
-  const user_data = users.find((user: any) => user.id === tweet_data['user_id'])
+  const tweeterCreds = users.find((user: any) => user.id === tweet_data['user_id']) // getthing the user data of the poster of the tweet by using getting it from tweet_data
   const parsedDate = parseISO(tweet_data['created_time'])
   const tweet_id = tweet_data['id']
+  const likedByMe = tweet_data['liked_by_me']
+  const likes_data = useAppSelector(selectLikes)
+  const [newLike, setnewLike] = useState(false)
   const dispatch = useAppDispatch()
   const navigate = useNavigate()
   const user = useAppSelector(selectUserData)
-  const user_id = user.id
+  const BrowsingUserID = user.id
   const formattedDate =
-    new Date().getTime() - parsedDate.getTime() < 24 * 60 * 60 * 1000
-      ? formatDistanceToNow(parsedDate, { addSuffix: false })
+    new Date().getTime() - parsedDate.getTime() < 24 * 60 * 60 * 1000 // doing if statement to check if its less than 24 hours
+      ? formatDistanceToNow(parsedDate, { addSuffix: false }) // if it is using formatdistancenow to display is as hr/mins/seconds ago
       : parsedDate.toLocaleDateString()
-  const [likedByMe, setLikedByMe] = useState(false)
-  const [isLikedCheck, setisLikedCheck] = useState(false)
+
 
   
   const tweetLike = (tweet_id: number, likes: number) => {
-    const user_id = user.id
     if (user.is_logged) {
-      dispatch(likeTweet({ user_id, tweet_id, likes }))
+      dispatch(likeTweet({ BrowsingUserID, tweet_id, likes }))
+      setnewLike(true)
     } else {
       navigate('/login')
     }
   }
+  
 
-  const isLikedByMe = async (user_id: number, tweet_id: number) => {
+
+  const unLike = ( tweet_id: number, likes: number) => {
+    console.log('tweet id',tweet_id,'browsing user id', BrowsingUserID);
+    const index = likes_data.findIndex(
+      (like) => like.user === BrowsingUserID && like.tweet === tweet_id
+    )
+    const likeID = likes_data[index]['id']
+    console.log('Found like ID:', likeID); 
     try {
-      const res = await dispatch(query_likes({ user_id, tweet_id }))
-      const response = res.payload;
-  
-      if (response['like_exists'] === true) {
-        setLikedByMe(true);
-      } else {
-        setLikedByMe(false);
-      }
+      dispatch(undoLike({ likeID, tweet_id, likes }))
     } catch (error) {
-      console.error("An error occurred while fetching like status:", error);
+      console.log('An error occured while trying to unlike this tweet', error);
+
     }
-  };
+  }
+
+  useEffect(() => {
+    dispatch(getLikes())
+
+    if (newLike) {
+      setnewLike(false)
+    }
+  }, [newLike])
   
+
+
   useEffect(() => {
     if (user.is_logged) {
-      isLikedByMe(user_id, tweet_data['id'])
-    } else {
-      setLikedByMe(false);
-    }
-
-  }, [user_id, tweet_data['id'], user.is_logged]);
+      dispatch(query_likes({ BrowsingUserID, tweet_id }))
+    } 
+  }, [BrowsingUserID, tweet_data['id'], user.is_logged, likedByMe]);
 
 
 
+  
 
   return (
     <div className="border-b-2 border-gray-600 w-full shrink relative  sm:bottom-5">
       <div className="container  w-95  sm:w-97% p-6 sm:p-8 max-h-max cursor-pointer">
         <div className="flex flex-row flex-shrink">
-          <ProfilePic image={user_data?.profile_image || ''} className="relative bottom-4 right-3 cursor-pointer" />
+          <ProfilePic image={tweeterCreds?.profile_image || ''} className="relative bottom-4 right-3 cursor-pointer" />
           <div className="flex flex-row relative bottom-4 space-x-1">
-            <p className="font-bold hover:underline cursor-pointer text-sm sm:text-base">{user_data?.display_name}</p>
-            {user_data?.is_verified && (
+            <p className="font-bold hover:underline cursor-pointer text-sm sm:text-base">{tweeterCreds?.display_name}</p>
+            {tweeterCreds?.is_verified && (
               <VerifiedIcon />
             )}
-            <p className="text-gray-500 font-semibold font-sans text-sm sm:text-base cursor-pointer">@{user_data?.username}</p>
+            <p className="text-gray-500 font-semibold font-sans text-sm sm:text-base cursor-pointer">@{tweeterCreds?.username}</p>
             <p className="relative left-1 text-gray-500 font-semibold font-sans text-sm sm:text-base">
               <span className="relative right-1 bottom-1 font-bold text-">.</span>
               {formattedDate}</p>
@@ -99,7 +112,10 @@ const TweetForm: React.FC<TweetFormProps> = ({ tweet_data }) => {
           {tweet_data['likes']}
           {likedByMe ? (
             <div>
-              <FavoriteIcon className="text-red-500" />
+              <FavoriteIcon 
+                className="text-red-500"
+                onClick={()=> unLike(tweet_data['id'], tweet_data['likes'])}
+              />
             </div>
           ) :
             <FavoriteBorderIcon

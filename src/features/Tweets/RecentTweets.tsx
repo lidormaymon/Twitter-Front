@@ -23,6 +23,8 @@ const RecentTweets: React.FC<RecentTweetsProps> = ({ newTweet, setNewTweet }) =>
     setNextPage(true)
   };
 
+  
+
   useEffect(() => {
     dispatch(getTweets())
     dispatch(getUsers())
@@ -37,10 +39,6 @@ const RecentTweets: React.FC<RecentTweetsProps> = ({ newTweet, setNewTweet }) =>
       setNextPage(false)
     }
   }, [isNextPage, currentPage])
-
-
-  
-  
 
 
   return (
