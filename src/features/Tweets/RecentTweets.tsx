@@ -1,10 +1,11 @@
 import React, { useEffect, useState } from "react";
 import { useAppDispatch, useAppSelector } from "../../app/hooks";
-import { getTweets, nextPage, selectTweets } from "./tweetSlice";
+import {  getTweetsPage, tweetNextPage, selectTweets } from "./slicer/tweetSlice";
 import { getUsers, selectUsers } from "../auth/authSlice";
-import ProfilePic from "../auth/ProfilePic";
-import TweetForm from "./TweetForm";
+
+import TweetForm from "./componets/TweetForm";
 import Button from "../componets/Button";
+import Loader from "../componets/Loader";
 
 interface RecentTweetsProps {
   newTweet: boolean;
@@ -14,19 +15,18 @@ interface RecentTweetsProps {
 const RecentTweets: React.FC<RecentTweetsProps> = ({ newTweet, setNewTweet }) => {
   const dispatch = useAppDispatch()
   const tweets = useAppSelector(selectTweets)
+  console.log(tweets);
   const [currentPage, setCurrentPage] = useState(1)
-
   const [isNextPage, setNextPage] = useState(false)
 
   const loadMoreTweets = () => {
     setCurrentPage(currentPage + 1)
     setNextPage(true)
-  };
+  }
 
-  
 
   useEffect(() => {
-    dispatch(getTweets())
+    dispatch(getTweetsPage())
     dispatch(getUsers())
     if (newTweet) {
       setNewTweet(false)
@@ -35,11 +35,14 @@ const RecentTweets: React.FC<RecentTweetsProps> = ({ newTweet, setNewTweet }) =>
 
   useEffect(() => {
     if (isNextPage) {
-      dispatch(nextPage(currentPage))
+      dispatch(tweetNextPage(currentPage))
       setNextPage(false)
     }
   }, [isNextPage, currentPage])
 
+  if (tweets === undefined) {
+    return <div><Loader /></div>
+  }
 
   return (
     <div>
@@ -65,8 +68,8 @@ const RecentTweets: React.FC<RecentTweetsProps> = ({ newTweet, setNewTweet }) =>
           )}
         </>
       ) : (
-        <div className="relative sm:bottom-5 sm:h-105 sm:border-b 3xl:h-130 sm:border-gray-600">
-          <p className="mx-4 relative top-3">No tweets have been posted yet.</p>
+        <div className="relative sm:bottom-5 sm:h-105 sm:border-b 3xl:h-120 sm:border-gray-600">
+          <p className="mx-4 relative top-3 text-center">No tweets have been posted yet.</p>
         </div>
       )}
     </div>

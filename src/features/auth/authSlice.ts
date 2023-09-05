@@ -1,6 +1,6 @@
 import { createAsyncThunk, createSlice} from '@reduxjs/toolkit';
 import { RootState } from '../../app/store';
-import { checkCredsValid, chkRefreshToken, login, register, getImageUrl, getUsersData } from './authAPI';
+import { checkCredsValid, chkRefreshToken, login, register, getUsersData, fetchUserPostsAPI, searchUsersAPI } from './authAPI';
 
 
 export interface userDataState {
@@ -15,7 +15,7 @@ export interface userDataState {
     is_staff: any,
     date_joined: any
     profile_image: string,
-    is_logged: boolean
+    is_logged: boolean,
 }
 
 export interface Users {
@@ -72,14 +72,6 @@ export const checkRefresh = createAsyncThunk(
     }
  )
 
- export const getPic = createAsyncThunk(
-    'auth/getPic',
-    async (path: string) => {
-      const response = await getImageUrl(path);
-      return response 
-    }
-  );
-
 export const getUsers = createAsyncThunk(
     'auth/users',
     async () => {
@@ -88,23 +80,38 @@ export const getUsers = createAsyncThunk(
     }
 )
 
+export const fetchUserPostsAsync = createAsyncThunk(
+    'count/posts',
+    async (user_id:number) => {
+        const response = await fetchUserPostsAPI(user_id)
+        return response.data
+    }
+)
+
+export const searchUsers = createAsyncThunk(
+    'auth/searchUsers',
+    async (searchQuery: string) => {
+      const response = await searchUsersAPI(searchQuery)
+      return response.data
+    }
+);
+
+
 export const authSlice = createSlice({
     name: 'auth',
     initialState,
     reducers: {
         logOut(state) {
-            localStorage.removeItem('refresh')
+            localStorage.removeItem('token')
             sessionStorage.removeItem('session')
             state.is_logged = false
             state.is_staff = false
         },
         getUserData(state) {
-            const session = sessionStorage.getItem('session')
-            if (session) {
-                const token = JSON.parse(atob(session.split(".")[1]))
-                console.log('token', token);
+            const tokenString = localStorage.getItem('token')
+            if (tokenString) {
+                const token = JSON.parse(atob(tokenString.split(".")[1]))
                 state.username = token['username']
-                console.log(token)  
                 state.email = token['email']
                 state.is_staff = token['staff']
                 state.is_superuser = token['super_user']
@@ -119,9 +126,12 @@ export const authSlice = createSlice({
         builder
             .addCase(loginCheck.fulfilled, (state, action) => {
                 state.is_logged = true
+                console.log(action.payload);
+                
+                const session = action.payload.refresh
                 const token = action.payload.access
-                sessionStorage.setItem('session', JSON.stringify(token ));
-                console.log('check from builder slicer', state.is_logged);
+                sessionStorage.setItem('session', JSON.stringify(session))
+                localStorage.setItem('token', JSON.stringify(token))
             })
         builder
             .addCase(credsCheck.fulfilled, (state, action) => {
@@ -130,24 +140,17 @@ export const authSlice = createSlice({
                     state.is_logged = true
                 }else {
                     localStorage.removeItem('session')
-                    console.log('bulbul');
-                    
                 }
             })
         builder
             .addCase(checkRefresh.fulfilled, (state, action) => {
+                state.is_logged = true
                 localStorage.setItem('refresh', JSON.stringify(action.payload.refresh))
                 sessionStorage.setItem('session', JSON.stringify(action.payload.access))
             })
         builder
-            .addCase(getPic.fulfilled, (state, action) => {
-                state.profile_image = action.payload;
-              });
-        builder
               .addCase(getUsers.fulfilled, (state, action) => {
                 state.UsersAR = action.payload
-                
-                
               })
     }
 })

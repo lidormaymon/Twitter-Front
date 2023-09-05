@@ -4,6 +4,8 @@ const API_SERVER = 'http://127.0.0.1:8000/'
 
 export function login(username:string, password:string){
     const creds = {username, password}
+    console.log(creds);
+    
     return axios.post(API_SERVER + 'login/' , creds)
 }
 
@@ -14,7 +16,6 @@ export function checkCredsValid (token:any) {
         }
     })
 }
-
 
 export function register(username: string, password: string, email: string, display_name: string, image: File) {
   const userData = new FormData();
@@ -35,10 +36,14 @@ export const chkRefreshToken = (refresh:any) => {
     return axios.post(API_SERVER + 'refresh/' , data)
 }
 
-export const getImageUrl = ( path: string) => {
-    return `${API_SERVER}${path}`
-}
-
 export const getUsersData = () => {
     return axios.get(API_SERVER + '/user' )
+}
+
+export const fetchUserPostsAPI = (user_id:number) => {
+    return axios.post(API_SERVER + `user-posts/`, { user_id: user_id})
+}
+
+export function searchUsersAPI(searchQuery: string) {
+  return axios.get(API_SERVER + 'search-users/?query=' + searchQuery);
 }

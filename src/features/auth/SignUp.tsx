@@ -71,7 +71,7 @@ const SignUp = () => {
   };
 
   return (
-    <div className="container mx-auto p-4 border-gray-600 border-2 w-72 md:w-100 h-fit flex flex-col relative 2xl:left-16 3xl:left-40 top-10 left-10 items-center justify-center rounded-lg">
+    <div className="container p-4 border-gray-600 border-2 w-72 md:w-100 h-fit flex flex-col relative left-14 2xl:left-16 3xl:left-40 top-10 items-center justify-center rounded-lg">
       <h1 className="text-2xl font-bold mb-4  underline relative right-20">Sign Up</h1>
       <div className="flex flex-col items-center">
         <p className="font-semibold relative right-14">Username</p>
@@ -149,7 +149,7 @@ const SignUp = () => {
           Already has an account?
         </a>
         <br />
-        <Button text="Sign up" className="w-36" onClick={signUp} />
+        <Button text="Sign up" className="w-36 hover:bg-blue-400" onClick={signUp} />
       </div>
     </div>
   );

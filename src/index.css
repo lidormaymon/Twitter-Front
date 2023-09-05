@@ -2,7 +2,9 @@
 @tailwind components;
 @tailwind utilities;
 
-
+/* * {
+  outline: 1px solid red !important;
+} */
 
 body {
   overflow-x: hidden;
@@ -15,9 +17,16 @@ textarea {
   resize: none;
 }
 
+.my-container {
+  @apply relative sm:border-l border-gray-600 sm:border-r sm:border-gray-600 flex flex-col min-h-screen h-fit w-screen sm:w-105 3xl:w-108
+}
+
+.message-container {
+  @apply relative sm:border-l border-gray-600 sm:border-r sm:border-gray-600 flex flex-col min-h-screen h-fit w-screen sm:w-120 3xl:w-145
+}
 
 .links {
-  @apply  text-2xl relative right-5 p-2 pl-4 bottom-3 hover:font-semibold w-40 text-center h-12 cursor-pointer
+  @apply  text-2xl relative right-5 p-2 pl-4 bottom-3 hover:font-semibold w-auto text-center h-12 cursor-pointer
   hover:transition-colors  hover:duration-500 hover:ease-in-out hover:bg-gray-700 hover:rounded-full
 }
 
@@ -28,4 +37,5 @@ textarea {
 .input {
   @apply border-b-1 border-black border-collapse outline-none bg-black
 }
+
 

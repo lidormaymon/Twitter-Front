@@ -3,9 +3,9 @@ import FollowingTweets from "./Tweets/FollowingTweets";
 import RecentTweets from "./Tweets/RecentTweets";
 import {  selectLoggedStatus,  selectUserData } from "./auth/authSlice";
 import { useAppDispatch, useAppSelector } from "../app/hooks";
-import { getTweets, postTweetData } from "./Tweets/tweetSlice";
+import {  postTweetData } from "./Tweets/slicer/tweetSlice";
 import Button from "./componets/Button";
-import ProfilePic from "./auth/ProfilePic";
+import ProfilePic from "./profile/componets/ProfilePic";
 
 
 interface HeaderProps {
@@ -17,7 +17,7 @@ const Header = ({ activeTab, handleTabClick }: HeaderProps) => {
   const isLogged = useAppSelector(selectLoggedStatus)
   return (
     <div className="container  w-full sm:w-105 3xl:w-108">
-      <div className="sticky top-0">
+      <div className="sticky top-0 ">
         <div className="border-b border-gray-600">
           <h1 className="font-bold font- text-xl mx-2 px-2 py-4">Home</h1>
           <div className="container flex flex-row">
@@ -57,9 +57,9 @@ const Home = () => {
   const user = useAppSelector(selectUserData)
   const dispatch = useAppDispatch()
   const isLogged = useAppSelector(selectLoggedStatus)
-  const [activeTab, setActiveTab] = useState("forYou");
+  const [activeTab, setActiveTab] = useState("forYou")
   const [tweetText, setTweetText] = useState('')
-  const [newTweet, setNewTweet] = useState(false);
+  const [newTweet, setNewTweet] = useState(false)
 
 
   const handleTextInput = (event: React.ChangeEvent<HTMLTextAreaElement>) => {
@@ -67,18 +67,18 @@ const Home = () => {
   };
 
   const handleTabClick = (tab: string) => {
-    setActiveTab(tab);
+    setActiveTab(tab)
   };
 
   const postTweet = (text: string) => {
-    const data: any = { user_id: user.id, text: text };
+    const data: any = { user_id: user.id, text: text }
     dispatch(postTweetData(data));
-    setNewTweet(true); 
+    setNewTweet(true)
     setTweetText('')
   };
 
   return (
-    <div className="relative sm:border-l border-gray-600 sm:border-r sm:bordezr-gray-600 h-fit max-h-max w-screen sm:w-105 3xl:w-108">
+    <div>
       <Header activeTab={activeTab} handleTabClick={handleTabClick} />
       {isLogged && (
         <div className="relative top-2 border-b-2 border-gray-600 h-44">
@@ -92,7 +92,8 @@ const Home = () => {
             />
             <Button
               text="Post"
-              className="relative top-4 left-72 md:left-105 3xl:left-110 font-semibold hover:bg-blue-400"
+              className={`relative top-4 left-72 md:left-105 3xl:left-110 font-semibol ${tweetText.trim() === '' ? 'bg-blue-800' : 'hover:bg-blue-400'}`}
+              disabled={tweetText.trim() === ''}
               onClick={()=> postTweet(tweetText)}
             />
           </div>
@@ -100,7 +101,7 @@ const Home = () => {
 
       )}
       <div className="relative top-5">
-        {activeTab === "forYou" ? <RecentTweets newTweet={newTweet} setNewTweet={setNewTweet} /> : <FollowingTweets />}
+        {activeTab === "forYou" ? <RecentTweets newTweet={newTweet} setNewTweet={setNewTweet} /> : <FollowingTweets  newTweet={newTweet} setNewTweet={setNewTweet} />}
       </div>
     </div>
   );

@@ -54,7 +54,7 @@ const Login = () => {
     }, [isLogged]);
 
     return (
-        <div className="container mx-auto p-4 border-gray-600 border-2 w-72 md:w-100 h-96 flex flex-col relative 2xl:left-16 3xl:left-40 top-20 left-10 items-center justify-center rounded-lg">
+        <div className="container p-4 border-gray-600 border-2 w-72 md:w-100 h-96 flex flex-col relative left-14 2xl:left-16 3xl:left-40 top-20 items-center justify-center rounded-lg">
             <h1 className="text-2xl font-bold mb-4  underline relative right-20">Login</h1>
             <div className="flex flex-col items-center">
                 <p className="font-semibold relative right-14">Username</p>
@@ -81,7 +81,7 @@ const Login = () => {
                     <p className='text-xs font-semibold relative left-2'>Remember me?</p>
                 </div>
                 <a href='/register' className="text-xs text-blue-400 underline font-medium relative right-4">Doesn't have an account?</a><br />
-                <Button text='Login' className="w-36" onClick={handleLogin} />
+                <Button text='Login' className="w-36 hover:bg-blue-400" onClick={handleLogin} />
             </div>
         </div>
     );

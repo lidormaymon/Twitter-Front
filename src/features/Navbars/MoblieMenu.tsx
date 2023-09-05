@@ -1,7 +1,9 @@
 import HomeIcon from '@mui/icons-material/Home';
 import LoginIcon from '@mui/icons-material/Login';
 import { useAppSelector } from '../../app/hooks';
-import { selectLoggedStatus } from '../auth/authSlice';
+import { selectLoggedStatus } from '../auth/authSlice'
+import logo from './logo.png'
+import { Link } from "react-router-dom";
 
 
 const MobileMenu = () => {
@@ -10,15 +12,15 @@ const MobileMenu = () => {
         <div className="sticky top-0 z-20 bg-black">
             <div className="flex flex-row  sm:hidden shrink border-none  sticky top-0">
                 <div className="flex flex-row w-full ">
-                    <img src="../twiter-logo.png" width={'30px'} className="relative left-2" />
+                    <img src={logo} width={'30px'} className="relative left-2" />
                     <div className="ml-auto ">
-                        <a href='/'>
+                        <Link to={'/'}>
                             <HomeIcon className="relative top-1 right-2" fontSize="large" />
-                        </a>
+                        </Link>
                         {!isLogged && (
-                            <a href='/login'>
+                            <Link to={'/login'}>
                                 <LoginIcon className='relative top-1 right-1' fontSize='large' />
-                            </a>
+                            </Link>
                         )}
                     </div>
                 </div>
