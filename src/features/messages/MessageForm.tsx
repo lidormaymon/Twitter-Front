@@ -20,6 +20,7 @@ const MessageForm: React.FC<MessageFormProps> = ({ messages }) => {
     new Date().getTime() - parsedDate.getTime() < 24 * 60 * 60 * 1000 // doing if statement to check if its less than 24 hours
       ? formatDistanceToNow(parsedDate, { addSuffix: false }) // if it is using formatdistancenow to display is as hr/mins/seconds ago
       : parsedDate.toLocaleDateString()
+      
 
   return (
     <div className='flex flex-col relative top-5 py-3'>

@@ -1,6 +1,6 @@
 import { createAsyncThunk, createSlice} from '@reduxjs/toolkit';
 import { RootState } from '../../app/store';
-import { checkCredsValid, chkRefreshToken, login, register, getUsersData, fetchUserPostsAPI, searchUsersAPI } from './authAPI';
+import { checkCredsValid, chkRefreshToken,  register, getUsersData, fetchUserPostsAPI, searchUsersAPI, loginAPI } from './authAPI';
 
 
 export interface userDataState {
@@ -38,10 +38,10 @@ const initialState: userDataState & Users  = {
     UsersAR:[]
 }
 
-export const loginCheck = createAsyncThunk(
+export const loginAsync = createAsyncThunk(
     'auth/login',
     async (cred: any) => {
-        const response = await login(cred.username, cred.password)
+        const response = await loginAPI(cred.username, cred.password)
         return response.data
     }
 )
@@ -124,13 +124,10 @@ export const authSlice = createSlice({
     },
     extraReducers: (builder) => {
         builder
-            .addCase(loginCheck.fulfilled, (state, action) => {
+            .addCase(loginAsync.fulfilled, (state, action) => {
                 state.is_logged = true
                 console.log(action.payload);
-                
-                const session = action.payload.refresh
                 const token = action.payload.access
-                sessionStorage.setItem('session', JSON.stringify(session))
                 localStorage.setItem('token', JSON.stringify(token))
             })
         builder

@@ -24,7 +24,7 @@ const TweetPage = () => {
   const isLoading = useAppSelector(selectTweetIsLoading)
   const tweet_comments = useAppSelector(selectTweetComments)
   const tweets = useAppSelector(selectTweets)
-  const tweetData = tweets[0] //index would always be 0 since, im trying to get one tweet
+  const tweetData = tweets[0] 
   const users = useAppSelector(selectUsers)
   const posterCreds = tweetData ? users.find((user: any) => user.id === tweetData.user_id) : null; // getthing the user data of the poster of the tweet by using getting it from tweet_data
   const likedByMe = tweetData?.liked_by_me
@@ -48,6 +48,8 @@ const TweetPage = () => {
       navigate('/login')
     }
   }
+  console.log(tweets);
+  
 
   const unLike = (tweet_id: number, likes: number) => {
     const index = likes_data.findIndex(

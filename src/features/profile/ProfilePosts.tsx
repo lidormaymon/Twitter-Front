@@ -14,6 +14,7 @@ export const ProfilePosts: React.FC<profilePostProps> = ({ profile_id }) => {
   const profileTweets = useAppSelector(selectTweets)
   const [currentPage, setCurrentPage] = useState(1)
   const [isNextPage, setNextPage] = useState(false)
+  const [sumbitEdited, setSumbitEdited] = useState(false)
 
   
   const loadMoreTweets = () => {
@@ -24,7 +25,10 @@ export const ProfilePosts: React.FC<profilePostProps> = ({ profile_id }) => {
   useEffect(() => {
     dispatch(fetchProfileTweetsAsync(profile_id))
     dispatch(getUsers())
-  }, [profile_id])
+    if (sumbitEdited) {
+      setSumbitEdited(false)
+    }
+  }, [profile_id, sumbitEdited])
 
   useEffect(() => {
     if (isNextPage) {
@@ -44,6 +48,7 @@ export const ProfilePosts: React.FC<profilePostProps> = ({ profile_id }) => {
               <div key={index}>
                 <TweetForm
                   tweet_data={data}
+                  setSumbitEdited={setSumbitEdited}
                 />
               </div>
             );

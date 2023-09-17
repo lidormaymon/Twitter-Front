@@ -2,7 +2,7 @@ import axios from "axios";
 
 const API_SERVER = 'http://127.0.0.1:8000/'
 
-export function login(username:string, password:string){
+export function loginAPI(username:string, password:string){
     const creds = {username, password}
     console.log(creds);
     
@@ -37,7 +37,7 @@ export const chkRefreshToken = (refresh:any) => {
 }
 
 export const getUsersData = () => {
-    return axios.get(API_SERVER + '/user' )
+    return axios.get(API_SERVER + 'user' )
 }
 
 export const fetchUserPostsAPI = (user_id:number) => {

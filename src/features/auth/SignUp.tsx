@@ -15,20 +15,15 @@ const SignUp = () => {
   const dispatch = useAppDispatch()
   const [agreeTerms, setAgreeTerms] = useState(false);
   const [inputType, setInputType] = useState("password");
+  const [isLoading, setIsLoading] = useState(false)
   const [signUpData, setSignUpData] = useState({
     username: "",
     display_name: "",
     password: "",
     con_pwd: "",
     email: "",
-    image:''
+    image: ''
   });
-
-  useEffect(() => {
-    if (isLogged) {
-      navigate("/");
-    }
-  }, [isLogged]);
 
   const handleInputChange = (event: any) => {
     const { name, value, type, files } = event.target;
@@ -45,7 +40,7 @@ const SignUp = () => {
       }));
     }
   };
-  
+
 
   const handleShowPwd = () => {
     setInputType((prevInputType) => (prevInputType === "password" ? "text" : "password"));
@@ -53,22 +48,35 @@ const SignUp = () => {
 
   const signUp = () => {
     console.log('sign upppp', signUpData);
-    
+
     if (signUpData.username !== '' &&
-     signUpData.display_name !== '' &&
-     signUpData.password !== '' &&
-     signUpData.con_pwd !== '' &&
-     signUpData.email !== '') {
+      signUpData.display_name !== '' &&
+      signUpData.password !== '' &&
+      signUpData.con_pwd !== '' &&
+      signUpData.email !== '') {
       if (signUpData.password === signUpData.con_pwd) {
-        dispatch(registerUser(signUpData))
-        .then((res) => {
-          if (res.payload['reg'] === 'success') {
-            navigate('/')
-          }
-        })
-      }else setWrongPwd(true)
-    }else setErrorMessage(true)
+        setIsLoading(true)
+        try {
+          dispatch(registerUser(signUpData))
+          .then((res) => {
+            if (res.payload['reg'] === 'success') {
+              navigate('/')
+            }
+          })
+        } catch (error) {
+          console.log(error);
+        } finally {
+          setIsLoading(false)
+        }
+      } else setWrongPwd(true)
+    } else setErrorMessage(true)
   };
+
+  useEffect(() => {
+    if (isLogged) {
+      navigate("/");
+    }
+  }, [isLogged, isLoading]);
 
   return (
     <div className="container p-4 border-gray-600 border-2 w-72 md:w-100 h-fit flex flex-col relative left-14 2xl:left-16 3xl:left-40 top-10 items-center justify-center rounded-lg">
@@ -133,23 +141,30 @@ const SignUp = () => {
         />
         <br />
         <p className="font-semibold relative right-5">Profile Picture</p>
-        <input 
-        type="file"
-         className="relative left-10" 
-         name="image" 
-         onChange={handleInputChange}  
-         accept="image/jpg, image/jpeg, image/png"
-         />
+        <input
+          type="file"
+          className="relative left-10"
+          name="image"
+          onChange={handleInputChange}
+          accept="image/jpg, image/jpeg, image/png"
+        />
         <br />
         <div className="flex flex-row relative right-10 bottom-4">
           <input type="checkbox" checked={agreeTerms} onChange={(event) => setAgreeTerms(event.target.checked)} />
           <p className="text-xs font-semibold relative left-2">Agree to terms</p>
         </div>
+        <div>
+          {wrongPwd ? (
+            <p className="text-red-500 text-xs relative right-4">Passwords are not matching</p>
+          ) : errorMessage ? (
+            <p className="text-red-500 text-xs relative right-4">Must fill all the fields!</p>
+          ) : null}
+        </div>
         <a href="/login" className="text-xs text-blue-400 underline font-medium relative right-4">
           Already has an account?
         </a>
         <br />
-        <Button text="Sign up" className="w-36 hover:bg-blue-400" onClick={signUp} />
+        <Button text="Sign up" isLoading={isLoading} className="w-36 hover:bg-blue-400" onClick={signUp} />
       </div>
     </div>
   );

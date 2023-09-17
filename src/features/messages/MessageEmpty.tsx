@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react"
-import { MessageLeftSide } from "./MessageLeftSide"
+import { ConversationList } from "./ConversationList"
 import { useAppSelector } from "../../app/hooks"
 import { selectUserData } from "../auth/authSlice"
 import { useNavigate } from "react-router-dom"
@@ -29,12 +29,12 @@ const MessageEmpty = () => {
   }, []);
 
   if (isLoading) {
-    return <div className="relative left-80 top-38"><Loader /></div>
+    return <div className="relative left-80 top-38"><Loader isTextLoading={true} /></div>
   }
   
   return (
     <div className="message-container">
-        <MessageLeftSide />
+        <ConversationList />
     </div>
   )
 }

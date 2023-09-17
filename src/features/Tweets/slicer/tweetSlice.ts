@@ -262,15 +262,7 @@ export const tweetSlice = createSlice({
         
         builder
             .addCase(getTweet.fulfilled, (state, action) => {
-                const updatedTweet = action.payload;
-                const tweetIndex = state.TweetsAR.findIndex(tweet => tweet.id === updatedTweet.id);
-            
-                if (tweetIndex !== -1) {
-                  state.TweetsAR[tweetIndex] = updatedTweet
-                } else {
-
-                  state.TweetsAR.push(updatedTweet)
-                }
+                state.TweetsAR = [action.payload]
             })
         builder
             .addCase(getTweetsPage.fulfilled, (state, action) => {
@@ -303,7 +295,7 @@ export const tweetSlice = createSlice({
         builder
             .addCase(deleteTweetAsync.fulfilled, (state, action) => {
                 console.log(action);
-                const deletedTweetId = action.meta.arg; // Assuming the tweet ID is available in meta.arg
+                const deletedTweetId = action.meta.arg; 
                 state.TweetsAR = state.TweetsAR.filter(tweet => tweet.id !== deletedTweetId);
             })
         builder

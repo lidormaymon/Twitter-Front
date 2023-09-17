@@ -15,6 +15,7 @@ import RightSide from "./features/RightSide";
 import SearchMobile from "./features/componets/Search/SearchMobile";
 import  MessageEmpty  from "./features/messages/MessageEmpty";
 import MessageChats from "./features/messages/MessageChats";
+import EditProfile from "./features/profile/EditProfile";
 
 
 function App() {
@@ -66,6 +67,7 @@ function App() {
             <Route path="/tweet-post/:id" element={<TweetPage />} />
             <Route path='/profile/:id' element={<Profile />} />
             <Route path="/profile/:id/:status" element={<FollowersList />} />
+            <Route path="/profile/:id/edit" element={<EditProfile />} />
             <Route path="/messages" element={<MessageEmpty />} />
             <Route path="/messages/:id" element={<MessageChats />} />
             <Route path="/search" element={<SearchMobile />} />

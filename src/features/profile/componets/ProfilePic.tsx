@@ -6,7 +6,7 @@ interface ImageComponentProps extends ImgHTMLAttributes<HTMLImageElement> {
 }
 
 const ProfilePic: React.FC<ImageComponentProps> = ({ image, className, ...rest }) => {
-  const API_SERVER = 'http://127.0.0.1:8000/'
+  const API_SERVER = 'http://127.0.0.1:8000'
 
   const getImageUrl = (imagePath: string) => {
     return `${API_SERVER}${imagePath}`;
@@ -14,7 +14,7 @@ const ProfilePic: React.FC<ImageComponentProps> = ({ image, className, ...rest }
 
   return (
     <div>
-      <img src={getImageUrl(image || '')} className={`rounded-full ${className}`} width={'50px'}   {...rest} />
+      <img src={getImageUrl(image || '')} className={`rounded-full ${className}`} width={'50px'} alt='profile_image'   {...rest} />
     </div>
   )
 }

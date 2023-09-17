@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import * as icons from 'react-icons/ai';
 import { useAppDispatch, useAppSelector } from '../../app/hooks';
-import { loginCheck, selectLoggedStatus } from './authSlice';
+import { loginAsync, selectLoggedStatus } from './authSlice';
 import Button from '../componets/Button';
 
 const Login = () => {
@@ -12,6 +12,7 @@ const Login = () => {
     const [wrongCredMSG, setWrongCredMSG] = useState(false);
     const [inputType, setInputType] = useState('password');
     const [rememberMe, setRememberMe] = useState(false);
+    const [isLoading, setIsLoading] = useState(false)
     const [loginData, setLoginData] = useState({
         username: '',
         password: '',
@@ -33,25 +34,38 @@ const Login = () => {
         }
     };
 
-    const handleLogin = () => {
-        dispatch(loginCheck(loginData)).then((res) => {
+    const handleLogin = async () => {
+        setIsLoading(true); // Set isLoading to true before making the request
+        try {
+            const res = await dispatch(loginAsync(loginData));
             console.log('ssssss', res);
             if (res.type === 'auth/login/fulfilled') {
                 if (rememberMe) {
-                    localStorage.setItem('refresh', res.payload.refresh);
+                    sessionStorage.setItem('refresh', res.payload.refresh);
                 }
                 navigate('/');
             } else {
                 setWrongCredMSG(true);
             }
-        });
+        } catch (error) {
+            console.log(error);  
+        } finally {
+            setIsLoading(false); // Set isLoading to false after the request is complete
+        }
     };
+
+    
+    
+    
+    
+    
+    
 
     useEffect(() => {
         if (isLogged) {
             navigate('/');
         }
-    }, [isLogged]);
+    }, [isLogged, isLoading]);
 
     return (
         <div className="container p-4 border-gray-600 border-2 w-72 md:w-100 h-96 flex flex-col relative left-14 2xl:left-16 3xl:left-40 top-20 items-center justify-center rounded-lg">
@@ -81,7 +95,7 @@ const Login = () => {
                     <p className='text-xs font-semibold relative left-2'>Remember me?</p>
                 </div>
                 <a href='/register' className="text-xs text-blue-400 underline font-medium relative right-4">Doesn't have an account?</a><br />
-                <Button text='Login' className="w-36 hover:bg-blue-400" onClick={handleLogin} />
+                <Button text='Login' isLoading={isLoading} className="w-36 hover:bg-blue-400" onClick={handleLogin} />
             </div>
         </div>
     );

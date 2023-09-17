@@ -15,9 +15,10 @@ interface RecentTweetsProps {
 const RecentTweets: React.FC<RecentTweetsProps> = ({ newTweet, setNewTweet }) => {
   const dispatch = useAppDispatch()
   const tweets = useAppSelector(selectTweets)
-  console.log(tweets);
   const [currentPage, setCurrentPage] = useState(1)
   const [isNextPage, setNextPage] = useState(false)
+  const [sumbitEdited, setSumbitEdited] = useState(false)
+  const [isLoading, setIsLoading] = useState(false)
 
   const loadMoreTweets = () => {
     setCurrentPage(currentPage + 1)
@@ -26,12 +27,22 @@ const RecentTweets: React.FC<RecentTweetsProps> = ({ newTweet, setNewTweet }) =>
 
 
   useEffect(() => {
-    dispatch(getTweetsPage())
+    setIsLoading(true)
+    try {
+      dispatch(getTweetsPage())
+    } catch (error) {
+      console.log(error)
+    }finally {
+      setIsLoading(false)
+    }
     dispatch(getUsers())
     if (newTweet) {
       setNewTweet(false)
     }
-  }, [newTweet])
+    if (sumbitEdited) {
+      setSumbitEdited(false)
+    }
+  }, [newTweet, sumbitEdited, isLoading])
 
   useEffect(() => {
     if (isNextPage) {
@@ -40,8 +51,8 @@ const RecentTweets: React.FC<RecentTweetsProps> = ({ newTweet, setNewTweet }) =>
     }
   }, [isNextPage, currentPage])
 
-  if (tweets === undefined) {
-    return <div><Loader /></div>
+  if (isLoading) {
+    return <div className="relative left-44 sm:left-80 top-20 sm:top-28 w-10"><Loader isTextLoading={true} /></div>
   }
 
   return (
@@ -53,6 +64,7 @@ const RecentTweets: React.FC<RecentTweetsProps> = ({ newTweet, setNewTweet }) =>
               <div key={index}>
                 <TweetForm
                   tweet_data={data}
+                  setSumbitEdited={setSumbitEdited}
                 />
               </div>
             );

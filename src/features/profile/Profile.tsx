@@ -28,9 +28,9 @@ const Profile = () => {
     const profileCreds = users.find((user: any) => user.id === profile_id)
     const isFollowing = useAppSelector(selectFollowStatusList)
     const isFollowingEntry = isFollowing.find(
-      (status) => status.from_user_id === BrowsingUser.id && status.to_user_id === profile_id
+        (status) => status.from_user_id === BrowsingUser.id && status.to_user_id === profile_id
     );
-    
+
     const isUserFollowing = isFollowingEntry ? isFollowingEntry.isFollowing : false;
     const followersData = useAppSelector(selectFollowersData)
     const [followFlag, setFollowFlag] = useState(false)
@@ -93,7 +93,9 @@ const Profile = () => {
                         />
                         {profileCreds?.id === BrowsingUser.id && (
                             <div className="relative left-44 sm:left-98 top-12">
-                                <Button text="Edit" className="hover:bg-blue-400" />
+                                <Link to={`edit`}>
+                                    <Button text="Edit" className="hover:bg-blue-400" />
+                                </Link>
                             </div>
                         )}
                         {profile_id !== BrowsingUser.id && (

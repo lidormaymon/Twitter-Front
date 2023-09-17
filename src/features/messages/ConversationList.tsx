@@ -52,10 +52,10 @@ const ConversationsList: React.FC<ConversationsListProps> = ({ data }) => {
         <div className='flex relative top-5 h-20 sm:w-65'>
           <div className='flex mx-3'>
             <ProfilePic image={RecipientUserCreds?.profile_image} width={'50px'} />
-            <div className='flex flex-col'>
+            <div className='flex flex-col w-auto'>
               <div className='flex flex-row'>
                 <p className='mx-4 font-bold text-lg'>{RecipientUserCreds?.display_name}</p>
-                <p className='relative left-14 text-xs text-gray-400'>{formattedDate}</p>
+                <p className='flex justify-end text-xs text-gray-400'>{formattedDate}</p>
               </div>
               <p className='mx-4 font-serif'>{last_message.text}</p>
             </div>
@@ -66,12 +66,14 @@ const ConversationsList: React.FC<ConversationsListProps> = ({ data }) => {
   )
 }
 
-export const MessageLeftSide = () => {
+export const ConversationList = () => {
   const dispatch = useAppDispatch()
   const BrowsingUser = useAppSelector(selectUserData)
   const BrowsingUserID = BrowsingUser.id
   const tokenString = localStorage.getItem('token')
   const conversations = useAppSelector(selectConverstaionsAR)
+
+
 
 
   useEffect(() => {
@@ -87,7 +89,7 @@ export const MessageLeftSide = () => {
   }, [conversations])
 
   return (
-    <div className=" hidden sm:flex flex-row border-r border-gray-600 min-h-screen h-fit w-69 3xl:w-70">
+    <div className={`${location.pathname === '/messages' ? `flex border-none sm:border-solid` : 'hidden'} sm:flex flex-row border-r border-gray-600 min-h-screen h-fit w-69 3xl:w-70`}>
       <div>
         <h1 className="px-5 py-5 text-2xl font-bold font-serif">Messages</h1>
         <div>

@@ -26,10 +26,11 @@ interface TweetFormProps {
     liked_by_me: boolean,
     edit:boolean
   },
+  setSumbitEdited?:React.Dispatch<React.SetStateAction<boolean>>
 }
 
 
-const TweetForm: React.FC<TweetFormProps> = ({ tweet_data }) => {
+const TweetForm: React.FC<TweetFormProps> = ({ tweet_data, setSumbitEdited }) => {
   const users = useAppSelector(selectUsers)
   const [newLike, setNewLike] = useState(false)
   const tweeterCreds = users.find((user: any) => user.id === tweet_data['user_id']) // getthing the user data of the poster of the tweet by using getting it from tweet_data
@@ -124,6 +125,9 @@ const TweetForm: React.FC<TweetFormProps> = ({ tweet_data }) => {
     event.preventDefault()
     setEditMode(false)
     dispatch(editTweetAsync({tweet_id, text}))
+    if (setSumbitEdited) {
+      setSumbitEdited(true);
+    }
   }
 
 
