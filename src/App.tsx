@@ -3,7 +3,7 @@ import SideNav from "./features/Navbars/SideNav"
 import { Routes, Route, useLocation } from "react-router-dom";
 import { useAppDispatch, useAppSelector } from './app/hooks'
 import { checkRefresh, credsCheck, getUserData, selectAdminStatus, selectLoggedStatus } from "./features/auth/authSlice";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import Login from "./features/auth/Login";
 import SignUp from "./features/auth/SignUp";
 import MobileMenu from "./features/Navbars/MoblieMenu";
@@ -13,74 +13,88 @@ import Profile from "./features/profile/Profile";
 import FollowersList from "./features/profile/FollowersList";
 import RightSide from "./features/RightSide";
 import SearchMobile from "./features/componets/Search/SearchMobile";
-import  MessageEmpty  from "./features/messages/MessageEmpty";
 import MessageChats from "./features/messages/MessageChats";
 import EditProfile from "./features/profile/EditProfile";
+import { GoogleOAuthProvider } from '@react-oauth/google';
+import { Error404 } from "./features/componets/Error404";
+import Loader from "./features/componets/Loader";
+import { ChangePWD } from "./features/auth/ChangePWD";
+
 
 
 function App() {
   const isLogged = useAppSelector(selectLoggedStatus)
   const token = localStorage.getItem('token')
-  const session = sessionStorage.getItem('session')
+  const session = sessionStorage.getItem('refresh')
   const dispatch = useAppDispatch()
   const isAdmin = useAppSelector(selectAdminStatus)
   const location = useLocation();
   const authPages = location.pathname === '/login' || location.pathname === '/register' || location.pathname.startsWith('/messages')
+  const noScrollPage = location.pathname === 'login' || location.pathname === 'register' || location.pathname.startsWith('/messages') ||
+    location.pathname.startsWith('/profile/edit')
+  const [authenticationComplete, setAuthenticationComplete] = useState(false)
 
 
   useEffect(() => {
     const credsValidChk = () => {
       if (token) {
-        const tokenData = JSON.parse(token)
-        dispatch(credsCheck(tokenData)).
-          then((res) => {
+        const tokenData = JSON.parse(token);
+        dispatch(credsCheck(tokenData))
+          .then((res) => {
             if (res.payload === 200) {
-              dispatch(getUserData())
+              dispatch(getUserData());
             } else {
               if (session) {
-                dispatch(checkRefresh(session)).then((res) => console.log('refreshhhhh1', res))
+                dispatch(checkRefresh(session)).then((res) => console.log('refreshhhhh1', res));
               }
             }
-          })
+          });
       } else {
         if (session) {
-          dispatch(checkRefresh(session)).then((res) => console.log('refreshhhhh2', res.payload))
+          dispatch(checkRefresh(session)).then((res) => console.log('refreshhhhh2', res.payload));
         }
       }
       console.log('user logged status = ', isLogged);
-    }
-    credsValidChk()
-  }, [isLogged, session, getUserData, isAdmin, session])
+      setAuthenticationComplete(true); 
+    };
 
+    credsValidChk();
+  }, [isLogged, session, getUserData, isAdmin, token]);
+
+  if (!authenticationComplete) {
+    return <div><Loader isTextLoading={true} /> </div>
+  }
 
 
   return (
     <div>
-      <MobileMenu />
-      <div className="flex flex-col sm:flex-row container sm:ml-80 3xl:ml-96  h-screen   ">
+      <div className={`flex flex-col sm:flex-row container sm:ml-80 3xl:ml-96  h-screen ${noScrollPage && 'overflow-y-hidden'}`}>
         <SideNav />
-        <div className={`${!authPages && 'my-container'}`}>
+        <MobileMenu />
+        <div className={`${!authPages && 'my-container'} `}>
           <Routes>
+            <Route path="*" element={<Error404 />} />
             <Route path="/" element={<Home />} />
             <Route path="/login" element={<Login />} />
             <Route path="/register" element={<SignUp />} />
             <Route path="/tweet-post/:id" element={<TweetPage />} />
             <Route path='/profile/:id' element={<Profile />} />
             <Route path="/profile/:id/:status" element={<FollowersList />} />
-            <Route path="/profile/:id/edit" element={<EditProfile />} />
-            <Route path="/messages" element={<MessageEmpty />} />
+            <Route path="/profile/edit" element={<EditProfile />} />
+            <Route path="/profile/edit/change-password" element={<ChangePWD />} />
+            <Route path="/messages" element={<MessageChats />} />
             <Route path="/messages/:id" element={<MessageChats />} />
             <Route path="/search" element={<SearchMobile />} />
           </Routes>
+          
         </div>
+        {isLogged && <FooterMenu /> }
         {!authPages && <RightSide />}
-        {isLogged && (
-          <FooterMenu />
-        )}
+
       </div>
     </div>
 
-  );
+  )
 }
 
 export default App;

@@ -1,41 +1,43 @@
-import { createAsyncThunk, createSlice} from '@reduxjs/toolkit';
+import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 import { RootState } from '../../app/store';
-import { checkCredsValid, chkRefreshToken,  register, getUsersData, fetchUserPostsAPI, searchUsersAPI, loginAPI } from './authAPI';
+import { checkCredsValid, chkRefreshToken, register, getUsersData, fetchUserPostsAPI, searchUsersAPI, loginAPI, editUserAPI, changePwdAPI } from './authAPI';
 
 
 export interface userDataState {
     id: number,
     is_superuser: any,
     username: string,
-    display_name:string,
+    display_name: string,
     first_name: string,
     last_name: string,
     email: string,
-    is_verified:boolean
+    is_verified: boolean
     is_staff: any,
     date_joined: any
     profile_image: string,
     is_logged: boolean,
+    bio: string,
 }
 
 export interface Users {
-    UsersAR:userDataState[]
+    UsersAR: userDataState[]
 }
 
-const initialState: userDataState & Users  = {
+const initialState: userDataState & Users = {
     is_logged: false,
     id: 0,
     is_superuser: false,
-    display_name:'',
+    display_name: '',
     username: '',
     first_name: '',
     last_name: '',
     email: '',
     is_staff: false,
     date_joined: null,
-    profile_image:'',
-    is_verified:false,
-    UsersAR:[]
+    profile_image: '',
+    is_verified: false,
+    bio: '',
+    UsersAR: []
 }
 
 export const loginAsync = createAsyncThunk(
@@ -46,10 +48,10 @@ export const loginAsync = createAsyncThunk(
     }
 )
 
-export const credsCheck = createAsyncThunk( 
+export const credsCheck = createAsyncThunk(
     'auth/credsCheck',
-    async (token:any) => {
-        const response = await checkCredsValid(token)  
+    async (token: any) => {
+        const response = await checkCredsValid(token)
         console.log(response.status);
         return response.status
     }
@@ -57,20 +59,20 @@ export const credsCheck = createAsyncThunk(
 
 export const checkRefresh = createAsyncThunk(
     'auth/chkRefresh',
-    async (refresh: any) => {
-        const response = await chkRefreshToken(refresh)   
+    async (refresh: string) => {
+        const response = await chkRefreshToken(refresh)
         return response.data
     }
 )
 
- export const registerUser = createAsyncThunk(
+export const registerUser = createAsyncThunk(
     'auth/signUp',
-    async ( data:any) => {
-        console.log(data,'slice');
-        const response = await register(data.username, data.password , data.email, data.display_name, data.image)
+    async (data: any) => {
+        console.log(data, 'slice');
+        const response = await register(data.username, data.password, data.email, data.display_name, data.image)
         return response.data
     }
- )
+)
 
 export const getUsers = createAsyncThunk(
     'auth/users',
@@ -82,7 +84,7 @@ export const getUsers = createAsyncThunk(
 
 export const fetchUserPostsAsync = createAsyncThunk(
     'count/posts',
-    async (user_id:number) => {
+    async (user_id: number) => {
         const response = await fetchUserPostsAPI(user_id)
         return response.data
     }
@@ -91,10 +93,29 @@ export const fetchUserPostsAsync = createAsyncThunk(
 export const searchUsers = createAsyncThunk(
     'auth/searchUsers',
     async (searchQuery: string) => {
-      const response = await searchUsersAPI(searchQuery)
-      return response.data
+        const response = await searchUsersAPI(searchQuery)
+        return response.data
     }
 );
+
+export const editUserAsync = createAsyncThunk(
+    'edit/user',
+    async (data: any) => {
+        const response = await editUserAPI(data.user_id, data.display_name, data.bio, data.image)
+        console.log(data);
+
+        return response.data
+    }
+)
+
+export const changePwdAsync = createAsyncThunk(
+    'change/pwd',
+    async (data: any) => {
+        console.log(data.username);
+        const response = await changePwdAPI(data.oldPWD, data.newPWD, data.user_id, data.username)
+        return response
+    }
+)
 
 
 export const authSlice = createSlice({
@@ -103,7 +124,7 @@ export const authSlice = createSlice({
     reducers: {
         logOut(state) {
             localStorage.removeItem('token')
-            sessionStorage.removeItem('session')
+            sessionStorage.removeItem('refresh')
             state.is_logged = false
             state.is_staff = false
         },
@@ -119,36 +140,34 @@ export const authSlice = createSlice({
                 state.profile_image = token['image']
                 state.display_name = token['display_name']
                 state.is_verified = token['is_verified']
+                state.bio = token['bio']
             }
         }
     },
     extraReducers: (builder) => {
-        builder
-            .addCase(loginAsync.fulfilled, (state, action) => {
+        builder.addCase(loginAsync.fulfilled, (state, action) => {
+            state.is_logged = true
+            console.log(action.payload);
+            const token = action.payload.access
+            localStorage.setItem('token', JSON.stringify(token))
+        })
+        builder.addCase(credsCheck.fulfilled, (state, action) => {
+            const status = action.payload
+            if (status === 200) {
                 state.is_logged = true
-                console.log(action.payload);
-                const token = action.payload.access
-                localStorage.setItem('token', JSON.stringify(token))
-            })
-        builder
-            .addCase(credsCheck.fulfilled, (state, action) => {
-                const status = action.payload
-                if (status === 200) {
-                    state.is_logged = true
-                }else {
-                    localStorage.removeItem('session')
-                }
-            })
-        builder
-            .addCase(checkRefresh.fulfilled, (state, action) => {
-                state.is_logged = true
-                localStorage.setItem('refresh', JSON.stringify(action.payload.refresh))
-                sessionStorage.setItem('session', JSON.stringify(action.payload.access))
-            })
-        builder
-              .addCase(getUsers.fulfilled, (state, action) => {
-                state.UsersAR = action.payload
-              })
+            } else {
+                localStorage.removeItem('token')
+                sessionStorage.removeItem('refresh')
+            }
+        })
+        builder.addCase(checkRefresh.fulfilled, (state, action) => {
+            state.is_logged = true
+            localStorage.setItem('token', JSON.stringify(action.payload.access))
+            sessionStorage.setItem('refresh', JSON.stringify(action.payload.refresh))
+        })
+        builder.addCase(getUsers.fulfilled, (state, action) => {
+            state.UsersAR = action.payload
+        })
     }
 })
 

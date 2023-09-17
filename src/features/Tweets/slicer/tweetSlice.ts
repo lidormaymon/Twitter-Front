@@ -1,13 +1,14 @@
 import { RootState } from '../../../app/store';
-import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
-import { 
-    postLike, postTweet, fetchTweetsPage, 
-    nextPageTweets, queryLikes, 
-    removeLike, fetchLikes, fetchTweet, 
-    postCommentAPI, fetchCommentsPage, tweetCommentLikeAPI, 
-    queryTweetCommentsLikesAPI, unLikeTweetCommentAPI, fetchCommentsLikesAPI, 
-    fetchProfileTweetsAPI, fetchFollowingTweetsAPI,nextPageFollowingTweetsAPI,
-    fetchProfileLikedTweetsAPI, nextPageProfileTweetsAPI, nextPageProfileLikedTweetsAPI, deleteTweetAPI, editTweetAPI
+import { Dictionary, createAsyncThunk, createSlice } from '@reduxjs/toolkit';
+import {
+    postLike, postTweet, fetchTweetsPage,
+    nextPageTweets, queryLikes,
+    removeLike, fetchLikes, fetchTweet,
+    postCommentAPI, fetchCommentsPage, tweetCommentLikeAPI,
+    queryTweetCommentsLikesAPI, unLikeTweetCommentAPI, fetchCommentsLikesAPI,
+    fetchProfileTweetsAPI, fetchFollowingTweetsAPI, nextPageFollowingTweetsAPI,
+    fetchProfileLikedTweetsAPI, nextPageProfileTweetsAPI, nextPageProfileLikedTweetsAPI,
+    deleteTweetAPI, editTweetAPI, fetchTweetLikesAPI
 } from './tweetAPI'
 
 
@@ -19,7 +20,7 @@ export interface TweetsTemp {
     likes: number
     text: string
     liked_by_me: boolean,
-    edit:boolean
+    edit: boolean
 }
 export interface TweetsLikeTemp {
     id: number,
@@ -29,38 +30,40 @@ export interface TweetsLikeTemp {
 }
 
 export interface TweetCommentTemp {
-    id:number,
-    likes:number,
-    comments:number,
-    text:string,
-    created_time:string,
-    user_id:number,
-    tweet_id:number,
+    id: number,
+    likes: number,
+    comments: number,
+    text: string,
+    created_time: string,
+    user_id: number,
+    tweet_id: number,
     liked_by_me: boolean
 }
 
 export interface TweetCommentLikeTemp {
-    id:number,
-    user_id:number,
-    comment_id:number,
-    created_time:string
+    id: number,
+    user_id: number,
+    comment_id: number,
+    created_time: string
 }
 
 
 export interface Tweets {
     TweetsAR: TweetsTemp[]
     TweetLikesAR: TweetsLikeTemp[]
+    TweetLikesViewAR: TweetsLikeTemp[]
     CommentsAR: TweetCommentTemp[]
-    TweetCommentLikeAR:TweetCommentLikeTemp[]
-    isLoading:boolean
+    TweetCommentLikeAR: TweetCommentLikeTemp[]
+    isLoading: boolean
 }
 
 const initialState: Tweets = {
     TweetsAR: [],
     TweetLikesAR: [],
-    CommentsAR:[],
-    TweetCommentLikeAR:[],
-    isLoading:false
+    TweetLikesViewAR: [],
+    CommentsAR: [],
+    TweetCommentLikeAR: [],
+    isLoading: false
 }
 
 // <----------------------------------- Tweets Async ------------------------------------------>
@@ -75,7 +78,7 @@ export const postTweetData = createAsyncThunk(
 
 export const getTweet = createAsyncThunk(
     'get/tweet',
-    async ( tweet_id:number) => {
+    async (tweet_id: number) => {
         const response = await fetchTweet(tweet_id)
         return response.data
     }
@@ -100,7 +103,7 @@ export const tweetNextPage = createAsyncThunk(
 
 export const fetchProfileTweetsAsync = createAsyncThunk(
     'profile/tweets',
-    async (user_id:number) => {
+    async (user_id: number) => {
         const response = await fetchProfileTweetsAPI(user_id)
         return response.data
     }
@@ -108,7 +111,7 @@ export const fetchProfileTweetsAsync = createAsyncThunk(
 
 export const nextPageProfileTweetsAsync = createAsyncThunk(
     'nextPage/profile',
-    async(data:any) => {
+    async (data: any) => {
         const response = await nextPageProfileTweetsAPI(data.currentPage, data.profile_id)
         return response.data
     }
@@ -116,7 +119,7 @@ export const nextPageProfileTweetsAsync = createAsyncThunk(
 
 export const fetchFollowingTweetsAsync = createAsyncThunk(
     'following/tweets',
-    async(data:any) => {
+    async (data: any) => {
         const response = await fetchFollowingTweetsAPI(data.user_id, data.token)
         return response.data
     }
@@ -124,7 +127,7 @@ export const fetchFollowingTweetsAsync = createAsyncThunk(
 
 export const nextPageFollowingTweetsAsync = createAsyncThunk(
     'nextPageFollowing/tweets',
-    async (data:any) => {
+    async (data: any) => {
         const repsonse = await nextPageFollowingTweetsAPI(data.currentPage, data.BrowsingUserID)
         return repsonse.data
     }
@@ -132,7 +135,7 @@ export const nextPageFollowingTweetsAsync = createAsyncThunk(
 
 export const fetchProfileLikedTweetsAsync = createAsyncThunk(
     'liked/tweets',
-    async (profile_id:number) => {
+    async (profile_id: number) => {
         const response = await fetchProfileLikedTweetsAPI(profile_id)
         return response.data
     }
@@ -140,7 +143,7 @@ export const fetchProfileLikedTweetsAsync = createAsyncThunk(
 
 export const nextPageProfileLikedTweetsAsync = createAsyncThunk(
     'nextPageFollowing/tweets',
-    async (data:any) => {
+    async (data: any) => {
         const repsonse = await nextPageProfileLikedTweetsAPI(data.currentPage, data.profile_id)
         return repsonse.data
     }
@@ -148,7 +151,7 @@ export const nextPageProfileLikedTweetsAsync = createAsyncThunk(
 
 export const deleteTweetAsync = createAsyncThunk(
     'delete/tweet',
-    async (tweet_id:number) => {
+    async (tweet_id: number) => {
         const response = await deleteTweetAPI(tweet_id)
         return response.data
     }
@@ -156,7 +159,7 @@ export const deleteTweetAsync = createAsyncThunk(
 
 export const editTweetAsync = createAsyncThunk(
     'edit/tweet',
-    async(data:any) => {
+    async (data: any) => {
         const response = await editTweetAPI(data.tweet_id, data.text)
         return response.data
     }
@@ -196,11 +199,19 @@ export const undoLike = createAsyncThunk(
     }
 )
 
+export const fetchTweetLikesAsync = createAsyncThunk(
+    'fetch/likes',
+    async (tweet_id: number) => {
+        const response = await fetchTweetLikesAPI(tweet_id)
+        return response.data
+    }
+)
+
 // <----------------------------------- Tweet Comments Async ------------------------------------------>
 
 export const getPageComments = createAsyncThunk(
     'page/comment',
-    async (tweet_id:number) => {
+    async (tweet_id: number) => {
         const response = await fetchCommentsPage(tweet_id)
         return response.data
     }
@@ -208,7 +219,7 @@ export const getPageComments = createAsyncThunk(
 
 export const postCommentAsync = createAsyncThunk(
     'post/comment',
-    async (data:any) => {
+    async (data: any) => {
         const response = await postCommentAPI(data.text, data.user_id, data.tweet_id, data.comments)
         return response
     }
@@ -226,7 +237,7 @@ export const getCommentLikes = createAsyncThunk(
 
 export const tweetCommentLikeAsync = createAsyncThunk(
     'like/comment',
-    async (data:any) => {
+    async (data: any) => {
         const response = await tweetCommentLikeAPI(data.user_id, data.comment_id, data.likes)
         return response
     }
@@ -234,7 +245,7 @@ export const tweetCommentLikeAsync = createAsyncThunk(
 
 export const queryTweetCommentsLikesAsync = createAsyncThunk(
     'query/comment-likes',
-    async(data:any) => {
+    async (data: any) => {
         const response = await queryTweetCommentsLikesAPI(data.BrowsingUserID, data.comment_id)
         return response.data
     }
@@ -242,7 +253,7 @@ export const queryTweetCommentsLikesAsync = createAsyncThunk(
 
 export const unlikeTweetCommentAsync = createAsyncThunk(
     'unlike/comment',
-    async (data:any) => {
+    async (data: any) => {
         const response = await unLikeTweetCommentAPI(data.like_id, data.comment_id, data.likes)
         return response
     }
@@ -259,154 +270,141 @@ export const tweetSlice = createSlice({
     extraReducers: (builder) => {
 
         // <----------------------------------- Tweets Builder ------------------------------------------>
-        
-        builder
-            .addCase(getTweet.fulfilled, (state, action) => {
-                state.TweetsAR = [action.payload]
-            })
-        builder
-            .addCase(getTweetsPage.fulfilled, (state, action) => {
-                state.TweetsAR = action.payload          
-            })
+
+        builder.addCase(getTweet.fulfilled, (state, action) => {
+            state.TweetsAR = [action.payload]
+        })
+        builder.addCase(getTweetsPage.fulfilled, (state, action) => {
+            state.TweetsAR = action.payload
+        })
         builder
             .addCase(tweetNextPage.fulfilled, (state, action) => {
                 state.TweetsAR.push(...action.payload)
             })
-        builder
-            .addCase(fetchFollowingTweetsAsync.fulfilled, (state, action) => {
-                state.TweetsAR = action.payload
-            })
-        builder
-            .addCase(nextPageFollowingTweetsAsync.fulfilled, (state, action) => {
-                state.TweetsAR.push(...action.payload)
-            })
-        builder
-            .addCase(fetchProfileLikedTweetsAsync.fulfilled, (state, action) => {
-                state.TweetsAR = action.payload
-            })
-        builder
-            .addCase(nextPageProfileTweetsAsync.fulfilled, (state, action) => {
-                state.TweetsAR.push(...action.payload)
-            })
-        builder
-            .addCase(fetchProfileTweetsAsync.fulfilled, (state, action) => {
-                state.TweetsAR = action.payload
-            })
-        builder
-            .addCase(deleteTweetAsync.fulfilled, (state, action) => {
-                console.log(action);
-                const deletedTweetId = action.meta.arg; 
-                state.TweetsAR = state.TweetsAR.filter(tweet => tweet.id !== deletedTweetId);
-            })
-        builder
-            .addCase(editTweetAsync.fulfilled, (state, action) => {
-                console.log(action);
-                const editResponse = action.payload       
-                const editedTweetIndex = state.TweetsAR.findIndex(tweet => tweet.id === editResponse.id)
-                if (editedTweetIndex !== -1) {
-                    state.TweetsAR[editedTweetIndex].text === editResponse.text
-                    state.TweetsAR[editedTweetIndex].edit === editResponse.edit
-                    console.log(state.TweetsAR[editedTweetIndex].text);
-                }
-                
-            })
+        builder.addCase(fetchFollowingTweetsAsync.fulfilled, (state, action) => {
+            state.TweetsAR = action.payload
+        })
+        builder.addCase(nextPageFollowingTweetsAsync.fulfilled, (state, action) => {
+            state.TweetsAR.push(...action.payload)
+        })
+        builder.addCase(fetchProfileLikedTweetsAsync.fulfilled, (state, action) => {
+            state.TweetsAR = action.payload
+        })
+        builder.addCase(nextPageProfileTweetsAsync.fulfilled, (state, action) => {
+            state.TweetsAR.push(...action.payload)
+        })
+        builder.addCase(fetchProfileTweetsAsync.fulfilled, (state, action) => {
+            state.TweetsAR = action.payload
+        })
+        builder.addCase(deleteTweetAsync.fulfilled, (state, action) => {
+            console.log(action);
+            const deletedTweetId = action.meta.arg;
+            state.TweetsAR = state.TweetsAR.filter(tweet => tweet.id !== deletedTweetId);
+        })
+        builder.addCase(editTweetAsync.fulfilled, (state, action) => {
+            console.log(action);
+            const editResponse = action.payload
+            const editedTweetIndex = state.TweetsAR.findIndex(tweet => tweet.id === editResponse.id)
+            if (editedTweetIndex !== -1) {
+                state.TweetsAR[editedTweetIndex].text === editResponse.text
+                state.TweetsAR[editedTweetIndex].edit === editResponse.edit
+                console.log(state.TweetsAR[editedTweetIndex].text);
+            }
+
+        })
         // <----------------------------------- Likes Builder ------------------------------------------>
 
-        builder
-            .addCase(getLikes.fulfilled, ( state, action) => {
-                state.TweetLikesAR = action.payload
-            })
-        builder
-            .addCase(likeTweet.fulfilled, (state, action) => {
-                const updatedLikeResponse = action.payload.incrementResponse.data
-                
-                const likedTweetIndex = state.TweetsAR.findIndex(tweet => tweet.id === updatedLikeResponse.id)
-                if (likedTweetIndex !== -1) {
-                    state.TweetsAR[likedTweetIndex].likes = updatedLikeResponse.likes
-                    state.TweetsAR[likedTweetIndex].liked_by_me = true
-                    state.TweetLikesAR = action.payload.likeResponse.data          
-                }
-            })
-        builder
-            .addCase(undoLike.fulfilled, (state, action) => {
-                const updatedLikeResponse = action.payload.decremenetLikesResponse.data
-                const likedTweetIndex = state.TweetsAR.findIndex(
-                    tweet => tweet.id === updatedLikeResponse.id
-                )
-                if (likedTweetIndex !== -1) {
-                    state.TweetsAR[likedTweetIndex].liked_by_me = false
-                    state.TweetsAR[likedTweetIndex].likes = updatedLikeResponse.likes
-                }
-            })
-        builder
-            .addCase(query_likes.fulfilled, (state, action) => {
-                const updatedLikeResponse = action.payload
-                const likedTweetIndex = state.TweetsAR.findIndex(
-                    tweet => tweet.id === updatedLikeResponse.tweet_id
-                ) 
-                const likeExists = updatedLikeResponse['like_exists']
-                state.TweetsAR[likedTweetIndex].liked_by_me = likeExists
-            })
+        builder.addCase(getLikes.fulfilled, (state, action) => {
+            state.TweetLikesAR = action.payload
+        })
+        builder.addCase(likeTweet.fulfilled, (state, action) => {
+            const updatedLikeResponse = action.payload.incrementResponse.data
+
+            const likedTweetIndex = state.TweetsAR.findIndex(tweet => tweet.id === updatedLikeResponse.id)
+            if (likedTweetIndex !== -1) {
+                state.TweetsAR[likedTweetIndex].likes = updatedLikeResponse.likes
+                state.TweetsAR[likedTweetIndex].liked_by_me = true
+                state.TweetLikesAR = action.payload.likeResponse.data
+            }
+        })
+        builder.addCase(undoLike.fulfilled, (state, action) => {
+            const updatedLikeResponse = action.payload.decremenetLikesResponse.data
+            const likedTweetIndex = state.TweetsAR.findIndex(
+                tweet => tweet.id === updatedLikeResponse.id
+            )
+            if (likedTweetIndex !== -1) {
+                state.TweetsAR[likedTweetIndex].liked_by_me = false
+                state.TweetsAR[likedTweetIndex].likes = updatedLikeResponse.likes
+            }
+        })
+        builder.addCase(query_likes.fulfilled, (state, action) => {
+            const updatedLikeResponse = action.payload
+            const likedTweetIndex = state.TweetsAR.findIndex(
+                tweet => tweet.id === updatedLikeResponse.tweet_id
+            )
+            const likeExists = updatedLikeResponse['like_exists']
+            state.TweetsAR[likedTweetIndex].liked_by_me = likeExists
+        })
+        builder.addCase(fetchTweetLikesAsync.fulfilled, (state, action) => {
+            state.TweetLikesViewAR = action.payload.likes
+            console.log(action);
+            
+        })
         // <----------------------------------- Tweet Comments Builder ------------------------------------------>
-        builder
-            .addCase(getPageComments.fulfilled, (state, action) => {
-                state.CommentsAR = action.payload
-            })
+        builder.addCase(getPageComments.fulfilled, (state, action) => {
+            state.CommentsAR = action.payload
+        })
 
 
         // <----------------------------------- Tweet Comments Likes Builder ------------------------------------------>
-        builder
-            .addCase(getCommentLikes.fulfilled, ( state, action) => {
+        builder.addCase(getCommentLikes.fulfilled, (state, action) => {
             state.TweetCommentLikeAR = action.payload
         })
-        builder
-            .addCase(tweetCommentLikeAsync.fulfilled, (state, action) => {
-                const updatedLikeResponse = action.payload.incremenetCommentLike.data
-                console.log(updatedLikeResponse);
-                
-                const likedCommentIndex = state.CommentsAR.findIndex(
-                    comment => comment.id === updatedLikeResponse.id
-                )
-                if (likedCommentIndex !== -1) {
-                    state.CommentsAR[likedCommentIndex].likes = updatedLikeResponse.likes
-                    state.CommentsAR[likedCommentIndex].liked_by_me = true
-                    state.TweetCommentLikeAR = action.payload.postCommentResponse.data          
-                }
-            })
-        builder
-            .addCase(queryTweetCommentsLikesAsync.pending, (state, action) => {
-                state.isLoading = true
-            })
-        builder
-            .addCase(queryTweetCommentsLikesAsync.fulfilled, (state, action) => {
-                state.isLoading = false
-                const updatedLikeResponse = action.payload
-                const likedCommentIndex = state.CommentsAR.findIndex(
-                    comment => comment.id === updatedLikeResponse.comment_id
-                )
-                const likeExists = updatedLikeResponse['like_exists']
-                state.CommentsAR[likedCommentIndex].liked_by_me = likeExists
-            })
-        builder
-            .addCase(unlikeTweetCommentAsync.fulfilled, (state, action) => {
-                console.log(action);
-                
-                const updatedLikeResponse = action.payload.decremenetLikesResponse.data
-                const likedCommentIndex = state.CommentsAR.findIndex(
-                    comment => comment.id === updatedLikeResponse.id
-                )
-                if (likedCommentIndex !== -1) {
-                    state.CommentsAR[likedCommentIndex].liked_by_me = false
-                    state.CommentsAR[likedCommentIndex].likes = updatedLikeResponse.likes
-                }
-            })
+        builder.addCase(tweetCommentLikeAsync.fulfilled, (state, action) => {
+            const updatedLikeResponse = action.payload.incremenetCommentLike.data
+            console.log(updatedLikeResponse);
+
+            const likedCommentIndex = state.CommentsAR.findIndex(
+                comment => comment.id === updatedLikeResponse.id
+            )
+            if (likedCommentIndex !== -1) {
+                state.CommentsAR[likedCommentIndex].likes = updatedLikeResponse.likes
+                state.CommentsAR[likedCommentIndex].liked_by_me = true
+                state.TweetCommentLikeAR = action.payload.postCommentResponse.data
+            }
+        })
+        builder.addCase(queryTweetCommentsLikesAsync.pending, (state, action) => {
+            state.isLoading = true
+        })
+        builder.addCase(queryTweetCommentsLikesAsync.fulfilled, (state, action) => {
+            state.isLoading = false
+            const updatedLikeResponse = action.payload
+            const likedCommentIndex = state.CommentsAR.findIndex(
+                comment => comment.id === updatedLikeResponse.comment_id
+            )
+            const likeExists = updatedLikeResponse['like_exists']
+            state.CommentsAR[likedCommentIndex].liked_by_me = likeExists
+        })
+        builder.addCase(unlikeTweetCommentAsync.fulfilled, (state, action) => {
+            console.log(action);
+
+            const updatedLikeResponse = action.payload.decremenetLikesResponse.data
+            const likedCommentIndex = state.CommentsAR.findIndex(
+                comment => comment.id === updatedLikeResponse.id
+            )
+            if (likedCommentIndex !== -1) {
+                state.CommentsAR[likedCommentIndex].liked_by_me = false
+                state.CommentsAR[likedCommentIndex].likes = updatedLikeResponse.likes
+            }
+        })
     }
 })
 
 
-export const selectTweetIsLoading = ( state: RootState) => state.tweet.isLoading
+export const selectTweetIsLoading = (state: RootState) => state.tweet.isLoading
 export const selectTweets = (state: RootState) => state.tweet.TweetsAR
-export const selectLikes = ( state: RootState) => state.tweet.TweetLikesAR
-export const selectTweetComments = ( state: RootState) => state.tweet.CommentsAR
-export const selectCommentLikes = ( state: RootState) => state.tweet.TweetCommentLikeAR
+export const selectLikes = (state: RootState) => state.tweet.TweetLikesAR
+export const selectViewLikes = (state: RootState) => state.tweet.TweetLikesViewAR
+export const selectTweetComments = (state: RootState) => state.tweet.CommentsAR
+export const selectCommentLikes = (state: RootState) => state.tweet.TweetCommentLikeAR
 export default tweetSlice.reducer

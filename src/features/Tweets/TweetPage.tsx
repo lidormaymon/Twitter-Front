@@ -6,7 +6,7 @@ import ChatBubbleOutlineIcon from '@mui/icons-material/ChatBubbleOutline'
 import FavoriteIcon from '@mui/icons-material/Favorite'
 import VerifiedIcon from '@mui/icons-material/Verified'
 import { formatDistanceToNow, parseISO } from 'date-fns'
-import { likeTweet, query_likes, undoLike, selectLikes, getLikes, selectTweets, getTweet, getPageComments, selectTweetComments, selectTweetIsLoading, deleteTweetAsync } from "./slicer/tweetSlice"
+import { likeTweet, query_likes, undoLike, selectLikes, getLikes, selectTweets, getTweet, getPageComments, selectTweetComments, selectTweetIsLoading, deleteTweetAsync, editTweetAsync } from "./slicer/tweetSlice"
 import { useNavigate, useParams } from "react-router-dom"
 import { useEffect, useState } from "react"
 import MoreHorizIcon from '@mui/icons-material/MoreHoriz'
@@ -15,16 +15,18 @@ import PostComment from "./componets/PostComment"
 import Comment from "./componets/Comment"
 import BackButton from "../componets/BackButton"
 import { Link } from "react-router-dom";
+import Button from "../componets/Button"
+import { ViewLikes } from "./componets/ViewLikes"
+
 
 
 
 const TweetPage = () => {
   const { id } = useParams<{ id: string }>() // Use type annotation to indicate the parameter type
   const tweet_id = Number(id)
-  const isLoading = useAppSelector(selectTweetIsLoading)
   const tweet_comments = useAppSelector(selectTweetComments)
   const tweets = useAppSelector(selectTweets)
-  const tweetData = tweets[0] 
+  const tweetData = tweets[0]
   const users = useAppSelector(selectUsers)
   const posterCreds = tweetData ? users.find((user: any) => user.id === tweetData.user_id) : null; // getthing the user data of the poster of the tweet by using getting it from tweet_data
   const likedByMe = tweetData?.liked_by_me
@@ -33,6 +35,10 @@ const TweetPage = () => {
   const navigate = useNavigate()
   const BrowsingUser = useAppSelector(selectUserData)
   const [toggleOptionsFlag, setToggleOptionsFlag] = useState(false)
+  const [editMode, setEditMode] = useState(false)
+  const [likesViewFlag, setlikesViewFlag] = useState(false)
+  const [editText, seteditText] = useState(tweetData.text)
+  const [sumbitEdited, setSumbitEdited] = useState(false)
   const BrowsingUserID = BrowsingUser.id
   const parsedDate = parseISO(tweetData?.created_time || '')
   const [newComment, setnewComment] = useState(false)
@@ -49,7 +55,7 @@ const TweetPage = () => {
     }
   }
   console.log(tweets);
-  
+
 
   const unLike = (tweet_id: number, likes: number) => {
     const index = likes_data.findIndex(
@@ -73,7 +79,33 @@ const TweetPage = () => {
   const deleteTweet = (event: React.MouseEvent, tweet_id: number) => {
     event.preventDefault()
     dispatch(deleteTweetAsync(tweet_id))
-    setToggleOptionsFlag(false)
+    navigate('/')
+  }
+
+  const toggleEdit = (event: React.MouseEvent) => {
+    event.preventDefault()
+    if (!editMode) {
+      setEditMode(true)
+      setToggleOptionsFlag(false)
+    } else {
+      setEditMode(false)
+    }
+  }
+
+  const handleTextInput = (event: React.ChangeEvent<HTMLTextAreaElement>) => {
+    seteditText(event.target.value);
+  };
+
+  const editTweet = (event: React.MouseEvent, tweet_id: number, text: string) => {
+    event.preventDefault()
+    setEditMode(false)
+    dispatch(editTweetAsync({ tweet_id, text }))
+    setSumbitEdited(true)
+  }
+
+  const toggleLikesView = () => {
+    setlikesViewFlag(true)
+    document.body.classList.add('overflow-hidden')
   }
 
   useEffect(() => {
@@ -83,35 +115,40 @@ const TweetPage = () => {
     if (newComment) {
       setnewComment(false)
     }
-  }, [newComment])
+    if (sumbitEdited) {
+      setSumbitEdited(false)
+    }
+  }, [newComment, sumbitEdited])
 
   useEffect(() => {
     dispatch(getLikes())
   }, [])
-  
+
 
   useEffect(() => {
     if (BrowsingUser.is_logged) {
       dispatch(query_likes({ BrowsingUserID, tweet_id }))
     }
-  }, [ tweet_id, BrowsingUser.is_logged, likedByMe, BrowsingUserID])
+  }, [tweet_id, BrowsingUser.is_logged, likedByMe, BrowsingUserID])
 
   if (!tweetData || !tweetData.user_id) {
-    return <div className="relative left-44 top-44 sm:left-72"><Loader /></div>; // Render a loading indicator
+    return <div className="relative left-44 top-44 sm:left-72"><Loader isTextLoading={true} /></div>; // Render a loading indicator
   }
 
- 
 
   return (
     <div className="my-container">
+      {likesViewFlag && (
+        <ViewLikes setlikesViewFlag={setlikesViewFlag} tweet_id={tweet_id} />
+      )}
       <div className="mx-2 sm:mx-10 relative top-10 h-">
         <div className="felx flex row relative bottom-5 sm:right-4 space-x-4">
-            <BackButton />
-            <p className="text-xl font-bold">Post</p>
+          <BackButton />
+          <p className="text-xl font-bold">Post</p>
         </div>
         <div className="flex relative bottom-3 sm:bottom-0 sm:right-4">
           <Link to={`/profile/${posterCreds?.id}`}>
-            <ProfilePic image={posterCreds?.profile_image} className="sm:w-14" alt="profile image" />
+            <ProfilePic image={posterCreds?.profile_image || ''} className="sm:w-14" alt="profile image" />
           </Link>
           <div className="mx-5 flex">
             <Link to={`/profile/${posterCreds?.id}`}>
@@ -126,32 +163,54 @@ const TweetPage = () => {
             <p className="text-gray-500 relative bottom-1 font-bold mx-1">.</p>
             <p className="text-gray-500 font-semibold">{formattedDate}</p>
             <div className="flex items-center">
-                {(BrowsingUserID === posterCreds?.id || BrowsingUser.is_staff) && (
-                  <>
-                    {toggleOptionsFlag ? (
-                      <div className="flex">
-                        <div className="w-16 rounded-md text-gray-400 font-semibold bg-gray-800 relative -left-1 sm:-left-1 text-center">
-                          {BrowsingUser.id === posterCreds?.id && (
-                            <p className="border-b border-gray-600 hover:bg-gray-600">Edit</p>
-                          )}
-                          <p onClick={(event) => deleteTweet(event, tweet_id)} className="hover:bg-gray-600">Delete</p>
-                        </div>
+              {(BrowsingUserID === posterCreds?.id || BrowsingUser.is_staff) && (
+                <>
+                  {toggleOptionsFlag ? (
+                    <div className="flex">
+                      <div className="w-16 rounded-md text-gray-400 font-semibold bg-gray-800 relative -left-1 sm:-left-1 text-center">
+                        {BrowsingUser.id === posterCreds?.id && (
+                          <p onClick={(event) => toggleEdit(event)} className="border-b border-gray-600 hover:bg-gray-600 cursor-pointer">Edit</p>
+                        )}
+                        <p onClick={(event) => deleteTweet(event, tweet_id)} className="hover:bg-gray-600 cursor-pointer">Delete</p>
                       </div>
-                    ) : null}
-                    <MoreHorizIcon
-                      className="flex flex-row text-gray-600 cursor-pointer relative bottom-4"
-                      onClick={(event) => toggleOption(event)}
-                    />
-                  </>
-                )}
-              </div>
+                    </div>
+                  ) : null}
+                  <MoreHorizIcon
+                    className="flex flex-row text-gray-600 cursor-pointer relative bottom-4"
+                    onClick={(event) => toggleOption(event)}
+                  />
+                </>
+              )}
+            </div>
           </div>
         </div>
-        <div className="relative left-20 bottom-5 w-72">
-          {tweetData.text}
-        </div>
+        {editMode ? (
+          <>
+            <textarea
+              className="bg-black border-b-1 border-gray-600 h-14 w-80 sm:w-98 3xl:w-102 relative left-13 sm:left-11 resize-none focus:outline-none"
+              value={editText}
+              onChange={handleTextInput}
+              onClick={(event) => event.preventDefault()}
+            />
+            <p
+              className="relative left-13 w-4 text-sm text-gray-400 cursor-pointer hover:underline"
+              onClick={(event) => toggleEdit(event)}
+            >Cancel
+            </p>
+            <Button
+              isLoading={false}
+              className="relative left-48 sm:left-98 3xl:left-100 top-5 h-10 w-20 sm:h-11 sm:w-24"
+              text="Edit"
+              onClick={(event) => editTweet(event, tweet_id, editText)}
+            />
+          </>
+        ) : (
+          <>
+            <p className="relative left-14 bottom-8">{tweetData.text}</p>
+          </>
+        )}
         <div className="flex w-40 flex-row gap-x-4 relative left-14">
-          {tweetData.likes}
+          <p onClick={() => toggleLikesView()} className="cursor-pointer">{tweetData.likes}</p>
           {likedByMe ? (
             <div>
               <FavoriteIcon
@@ -170,14 +229,14 @@ const TweetPage = () => {
         </div>
         <div className="relative right-10 w-97 sm:w-105 border-b border-gray-600 h-4 sm:h-6" />
         {BrowsingUser.is_logged && (
-          <PostComment setnewComment={setnewComment} comments={tweetData.comments} tweet_id={tweet_id} className="border-t-0 relative right-4 sm:right-10 w-96 sm:w-105"  />
+          <PostComment setnewComment={setnewComment} comments={tweetData.comments} tweet_id={tweet_id} className="border-t-0 relative right-4 sm:right-10 w-96 sm:w-105" />
         )}
       </div>
-      {tweet_comments.map((data:any, index:any) => (
-          <div key={index} >
-              <Comment  tweet_comments={data} />
-          </div>
-        ))}
+      {tweet_comments.map((data: any, index: any) => (
+        <div key={index} >
+          <Comment tweet_comments={data} />
+        </div>
+      ))}
     </div>
   )
 }

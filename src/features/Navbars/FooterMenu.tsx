@@ -10,7 +10,7 @@ const FooterMenu = () => {
   const dispatch = useAppDispatch()
   const BrowsingUser = useAppSelector(selectUserData)
   return (
-    <div className=' sticky bottom-0 z-10 bg-black'>
+    <div className='sticky bottom-0 z-10 bg-black'>
       <div className='p-4 w-full space-x-18 border-t-1 border-gray-400 sm:hidden flex flex-row shrink'>
         <Link to={`/profile/${BrowsingUser.id}`} className='w-1/4 hover:bg-gray-700'><PersonIcon fontSize='large' /></Link>
         <Link to={'/messages'} className='w-1/4 hover:bg-gray-700'><MailOutlineIcon fontSize='large' /></Link>

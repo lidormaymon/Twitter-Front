@@ -49,6 +49,7 @@ const ProfileLikes: React.FC<profileLikeProps> = ({profile_id}) => {
           {profileTweets.length > 9 && (
             <div className="mx-auto mt-4 h-20  sm:border-b sm:border-gray-600 border-r border-l relative sm:bottom-5">
               <Button
+                isLoading={false}
                 text="Load more"
                 className="relative left-38  sm:left-67 top-1 font-semibold"
                 onClick={() => loadMoreTweets()}

@@ -98,7 +98,7 @@ const Comment: React.FC<CommentProps> = ({ tweet_comments }) => {
                 <div className="flex">
                     <div>
                         <Link to={`/profile/${commnetPosterCreds?.id}`}>
-                            <ProfilePic image={commnetPosterCreds?.profile_image} />
+                            <ProfilePic image={commnetPosterCreds?.profile_image || ''} />
                         </Link>
                     </div>
                     <div className="flex  mx-4 sm:mx-6">

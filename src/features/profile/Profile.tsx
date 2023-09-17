@@ -1,4 +1,4 @@
-import { useParams } from "react-router-dom"
+import { useNavigate, useParams } from "react-router-dom"
 import { useAppDispatch, useAppSelector } from "../../app/hooks"
 import { useEffect, useState } from "react"
 import { getUsers, selectUserData, selectUsers } from "../auth/authSlice"
@@ -19,11 +19,13 @@ import Loader from "../componets/Loader"
 import ProfileHeader from "./componets/ProfileHeader"
 import { Link } from "react-router-dom";
 import MailOutlineIcon from '@mui/icons-material/MailOutline';
+import { Error404 } from "../componets/Error404"
 
 const Profile = () => {
     const { id } = useParams<{ id: string }>()
     const profile_id = Number(id)
     const users = useAppSelector(selectUsers)
+    const navigate = useNavigate()
     const BrowsingUser = useAppSelector(selectUserData)
     const profileCreds = users.find((user: any) => user.id === profile_id)
     const isFollowing = useAppSelector(selectFollowStatusList)
@@ -47,8 +49,9 @@ const Profile = () => {
         : '';
 
     const follow = () => {
-
+        setFollowFlag(true)
         dispatch(postFolloweAsync({ from_user_id: BrowsingUser.id, to_user_id: profile_id }))
+        
     }
 
     const unFollow = () => {
@@ -63,22 +66,24 @@ const Profile = () => {
 
     useEffect(() => {
         dispatch(getUsers())
-    }, [])
+        profile_id === 1 && navigate('/')
+    }, [profile_id])
 
     useEffect(() => {
         dispatch(fetchFollowersAsync())
         dispatch(countFollowersFollowingAsync(profile_id))
-        if (followFlag) {
-            console.log('heyyyy')
-            setFollowFlag(false)
-        }
+        followFlag && setFollowFlag(false)
         if (BrowsingUser.is_logged) {
             if (BrowsingUser.id !== profile_id) {
+                console.log('yes');
                 dispatch(isFollowingAsync({ from_user_id: BrowsingUser.id, to_user_id: profile_id }))
             }
         }
     }, [BrowsingUser.is_logged, profile_id, BrowsingUser.id, followFlag, followersData.followers, followersData.following])
 
+    if (profileCreds === undefined) {
+        return <Error404 />
+    }
 
 
     return (
@@ -93,8 +98,8 @@ const Profile = () => {
                         />
                         {profileCreds?.id === BrowsingUser.id && (
                             <div className="relative left-44 sm:left-98 top-12">
-                                <Link to={`edit`}>
-                                    <Button text="Edit" className="hover:bg-blue-400" />
+                                <Link to={`/profile/edit`}>
+                                    <Button text="Edit" isLoading={false} className="hover:bg-blue-400 rounded-sm" />
                                 </Link>
                             </div>
                         )}
@@ -107,6 +112,7 @@ const Profile = () => {
                                         </Link>
                                         {isUserFollowing ? (
                                             <Button
+                                                isLoading={false}
                                                 onMouseEnter={handleHover}
                                                 onMouseLeave={handleHover}
                                                 text={hovered && isFollowing ? 'Unfollow' : isFollowing ? 'Following' : 'Follow'}
@@ -115,6 +121,7 @@ const Profile = () => {
                                             />
                                         ) : (
                                             <Button
+                                                isLoading={false}
                                                 text="Follow"
                                                 onClick={() => follow()}
                                             />
@@ -138,12 +145,13 @@ const Profile = () => {
                                 </div>
                             </div>
                             <p className="font-semibold text-gray-500">@{profileCreds?.username}</p>
+                            <p className="font-semibold  w-82 sm:w-102 text-sm relative top-2" style={{whiteSpace:'pre-wrap'}}>{profileCreds?.bio}</p>
                         </div>
-                        <div className="flex flex-row relative top-8 space-x-3 w-48">
+                        <div className="flex flex-row relative top-10 space-x-3 w-72">
                             <CalendarMonthIcon className="text-gray-500" fontSize="small" />
                             <p className="font-semibold text-gray-500 text-sm">Joined {formattedJoinedDate}</p>
                         </div>
-                        <div className="relative top-10">
+                        <div className="relative top-12">
                             <div className="flex flex-row space-x-3">
                                 <div className="flex flex-row space-x-1">
                                     <p className="font-bold">{followersData.followers}</p>

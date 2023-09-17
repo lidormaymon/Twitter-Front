@@ -4,7 +4,6 @@ import { registerUser, selectLoggedStatus } from "./authSlice";
 import { useEffect, useState } from "react";
 import * as icons from "react-icons/ai";
 import Button from "../componets/Button";
-
 import { useAppDispatch } from "../../app/hooks";
 
 const SignUp = () => {
@@ -22,7 +21,7 @@ const SignUp = () => {
     password: "",
     con_pwd: "",
     email: "",
-    image: ''
+    image: File
   });
 
   const handleInputChange = (event: any) => {
@@ -49,11 +48,11 @@ const SignUp = () => {
   const signUp = () => {
     console.log('sign upppp', signUpData);
 
-    if (signUpData.username !== '' &&
-      signUpData.display_name !== '' &&
-      signUpData.password !== '' &&
-      signUpData.con_pwd !== '' &&
-      signUpData.email !== '') {
+    if (signUpData.username.trim() !== '' &&
+      signUpData.display_name.trim() !== '' &&
+      signUpData.password.trim() !== '' &&
+      signUpData.con_pwd.trim() !== '' &&
+      signUpData.email.trim() !== '') {
       if (signUpData.password === signUpData.con_pwd) {
         setIsLoading(true)
         try {
@@ -149,10 +148,6 @@ const SignUp = () => {
           accept="image/jpg, image/jpeg, image/png"
         />
         <br />
-        <div className="flex flex-row relative right-10 bottom-4">
-          <input type="checkbox" checked={agreeTerms} onChange={(event) => setAgreeTerms(event.target.checked)} />
-          <p className="text-xs font-semibold relative left-2">Agree to terms</p>
-        </div>
         <div>
           {wrongPwd ? (
             <p className="text-red-500 text-xs relative right-4">Passwords are not matching</p>

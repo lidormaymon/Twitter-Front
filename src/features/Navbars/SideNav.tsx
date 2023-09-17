@@ -15,12 +15,12 @@ const SideNav = () => {
     const isLogged = useAppSelector(selectLoggedStatus);
 
     return (
-        <div className=" sm:sticky sm:top-0 self-start z-10 hidden sm:block">
-            <ul className="relative top-6 sm:left-3 2xl:right-8 right-20 h-full px-2 py-4">
+        <div className="sm:sticky sm:top-0 h-fit self-start z-50 hidden sm:block border-red-500 ">
+            <ul className="relative top-0 sm:left-3 2xl:right-8 right-20 h-full px-2 py-4">
                 <div className="relative  lg:right-2">
                     <span>
                         <Link to='/'>
-                            <p className="text-blue-400 font-bold font-serif text-2xl relative right-4">Twitter</p>
+                            <p className="text-blue-400 font-bold font-serif text-2xl relative">Litter</p>
                         </Link>
                     </span>
                     <img src={logo} width={'25px'} className="relative bottom-6 left-20" />

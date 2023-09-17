@@ -103,6 +103,10 @@ export const removeLike = (like_id:number, tweet_id:number, likes:number) => {
     });
 }
 
+export const fetchTweetLikesAPI = (tweet_id:number) => {
+    return axios.post(API_SERVER + `who-liked-tweet/`, {tweet_id})
+}
+
 
 // <----------------------------------- Tweet Comments API ------------------------------------------>
 

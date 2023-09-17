@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useAppDispatch, useAppSelector } from "../../app/hooks";
-import {  getTweetsPage, tweetNextPage, selectTweets } from "./slicer/tweetSlice";
+import { getTweetsPage, tweetNextPage, selectTweets } from "./slicer/tweetSlice";
 import { getUsers, selectUsers } from "../auth/authSlice";
 
 import TweetForm from "./componets/TweetForm";
@@ -19,22 +19,23 @@ const RecentTweets: React.FC<RecentTweetsProps> = ({ newTweet, setNewTweet }) =>
   const [isNextPage, setNextPage] = useState(false)
   const [sumbitEdited, setSumbitEdited] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
+  const [isLoadingBtn, setisLoadingBtn] = useState(false)
 
   const loadMoreTweets = () => {
-    setCurrentPage(currentPage + 1)
-    setNextPage(true)
+    setisLoadingBtn(true)
+    try {
+      setCurrentPage(currentPage + 1)
+      setNextPage(true)
+    } catch (error) {
+      console.log(error);
+    } finally {
+      setisLoadingBtn(false)
+    }
   }
 
 
   useEffect(() => {
-    setIsLoading(true)
-    try {
-      dispatch(getTweetsPage())
-    } catch (error) {
-      console.log(error)
-    }finally {
-      setIsLoading(false)
-    }
+    dispatch(getTweetsPage())
     dispatch(getUsers())
     if (newTweet) {
       setNewTweet(false)
@@ -59,7 +60,7 @@ const RecentTweets: React.FC<RecentTweetsProps> = ({ newTweet, setNewTweet }) =>
     <div>
       {tweets.length > 0 ? (
         <>
-          {tweets.map((data: any, index: any) => {          
+          {tweets.map((data: any, index: any) => {
             return (
               <div key={index}>
                 <TweetForm
@@ -72,6 +73,7 @@ const RecentTweets: React.FC<RecentTweetsProps> = ({ newTweet, setNewTweet }) =>
           {tweets.length > 9 && (
             <div className="mx-auto mt-4 h-20  sm:border-b sm:border-gray-600 relative sm:bottom-5">
               <Button
+                isLoading={isLoadingBtn}
                 text="Load more"
                 className="relative left-38  sm:left-67 top-1 font-semibold"
                 onClick={() => loadMoreTweets()}

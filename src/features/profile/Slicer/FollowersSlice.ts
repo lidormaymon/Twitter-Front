@@ -1,8 +1,8 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 import { RootState } from '../../../app/store';
-import { 
-    countFollowersFollowingAPI, deleteFollowAPI, fetchFollowersAPI, 
-    fetchFollowersListAPI, postFollowAPI, isFollowingAPI 
+import {
+    countFollowersFollowingAPI, deleteFollowAPI, fetchFollowersAPI,
+    fetchFollowersListAPI, postFollowAPI, isFollowingAPI
 } from './FollowerAPI';
 
 export interface FollowersTemp { // an interface temp thatd be used to store all the follows in general
@@ -14,10 +14,11 @@ export interface FollowersTemp { // an interface temp thatd be used to store all
 }
 
 export interface FollowersListTemp { //an interface temp that would be used for following and followers list
-    user_id:number
+    user_id: number
 }
 
 export interface FollowStatus {
+    id:number,
     from_user_id: number;
     to_user_id: number;
     isFollowing: boolean;
@@ -36,7 +37,7 @@ const initialState: Followers = {
     FollowersListAR: [],
     FollowingListAR: [],
     FollowersAR: [],
-    followStatusList: [], 
+    followStatusList: [],
     followers: 0,
     following: 0
 }
@@ -96,16 +97,17 @@ export const followersSlice = createSlice({
     name: 'followers',
     initialState,
     reducers: {
-        
+
     },
     extraReducers: (builder) => {
         builder
             .addCase(fetchFollowersAsync.fulfilled, (state, action) => {
                 state.FollowersAR = action.payload
+                
             })
         builder
             .addCase(isFollowingAsync.fulfilled, (state, action) => {
-                const { from_user_id, to_user_id, follower_exists } = action.payload;
+                const { from_user_id, to_user_id, follower_exists, id } = action.payload;
                 const existingStatusIndex = state.followStatusList.findIndex(
                     status => status.from_user_id === from_user_id && status.to_user_id === to_user_id
                 );
@@ -113,37 +115,30 @@ export const followersSlice = createSlice({
                 if (existingStatusIndex !== -1) {
                     state.followStatusList[existingStatusIndex].isFollowing = follower_exists;
                 } else {
-                    state.followStatusList.push({ from_user_id, to_user_id, isFollowing: follower_exists });
+                    state.followStatusList.push({ from_user_id, to_user_id, isFollowing: follower_exists, id });
                 }
             });
-            builder
+        builder
             .addCase(postFolloweAsync.fulfilled, (state, action) => {
-                const { from_user_id, to_user_id } = action.payload;
+                const { from_user_id, to_user_id, id } = action.payload;
                 const existingStatusIndex = state.followStatusList.findIndex(
                     status => status.from_user_id === from_user_id && status.to_user_id === to_user_id
                 );
-        
+
                 if (existingStatusIndex !== -1) {
                     state.followStatusList[existingStatusIndex].isFollowing = true;
                 } else {
-                    state.followStatusList.push({ from_user_id, to_user_id, isFollowing: true });
-                }
+                    state.followStatusList.push({ from_user_id, to_user_id, isFollowing: true, id });
+                }        
             });
-        
         builder
             .addCase(deleteFollowAsync.fulfilled, (state, action) => {
-                const { from_user_id, to_user_id } = action.payload
+                const follow_id = action.meta['arg']
                 const existingStatusIndex = state.followStatusList.findIndex(
-                    status => status.from_user_id === from_user_id && status.to_user_id === to_user_id
-                );
-        
-                if (existingStatusIndex !== -1) {
-                    state.followStatusList[existingStatusIndex].isFollowing = false;
-                } else {
-                    state.followStatusList.push({ from_user_id, to_user_id, isFollowing: false });
-                }
-                console.log(action.payload)
+                    status => status.id === follow_id
+                )
                 
+
             });
         builder
             .addCase(countFollowersFollowingAsync.fulfilled, (state, action) => {
@@ -160,7 +155,7 @@ export const followersSlice = createSlice({
                 console.log(state.FollowersListAR)
                 state.FollowingListAR = action.payload.following
                 console.log(state.FollowingListAR);
-                
+
             })
     }
 })
@@ -169,5 +164,5 @@ export const selectFollowersData = (state: RootState) => state.followers
 export const selectFollowers = (state: RootState) => state.followers.FollowersAR
 export const selectFollowStatusList = (state: RootState) => state.followers.followStatusList;
 export const selectFollowersListAR = (state: RootState) => state.followers.FollowersListAR
-export const selectFollowingListAR = ( state: RootState) => state.followers.FollowingListAR
+export const selectFollowingListAR = (state: RootState) => state.followers.FollowingListAR
 export default followersSlice.reducer

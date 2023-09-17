@@ -11,7 +11,7 @@ const BackButton: React.FC<BackButtonProps> = ({className}) => {
 
   return (
     <div>
-        <ArrowBackIcon onClick={()=> navigate(-1)}  className={`cursor-pointer rounded-full h-9  hover:bg-gray-700  ${className}`} />
+        <ArrowBackIcon onClick={()=> navigate(-1)}  className={`cursor-pointer rounded-sm h-9  hover:bg-gray-700  ${className}`} />
     </div>
   )
 }

@@ -17,7 +17,6 @@ export const deleteFollowAPI = (follow_id:number) => {
 
 export const isFollowingAPI = (from_user_id:number, to_user_id:number) => {
     const data = {from_user_id, to_user_id}
-    
     return axios.post(API_SERVER + 'query-followers/', data)
 }
 

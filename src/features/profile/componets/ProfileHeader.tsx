@@ -18,8 +18,9 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({display_name, is_verified,
 
     useEffect(() => {
         dispatch(fetchUserPostsAsync(profile_id)).then(
-            (res: any) => setUserPosts(res.payload['post_count']))
+            (res: any) => setUserPosts(res.payload.post_count))
     }, [userPosts, profile_id])
+    
     return (
         <div className="flex flex-row">
             <BackButton />

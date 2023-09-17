@@ -1,11 +1,13 @@
 import { useEffect, useState } from "react";
 import FollowingTweets from "./Tweets/FollowingTweets";
 import RecentTweets from "./Tweets/RecentTweets";
-import {  selectLoggedStatus,  selectUserData } from "./auth/authSlice";
+import { getUsers, selectLoggedStatus, selectUserData, selectUsers } from "./auth/authSlice";
 import { useAppDispatch, useAppSelector } from "../app/hooks";
-import {  postTweetData } from "./Tweets/slicer/tweetSlice";
+import { postTweetData } from "./Tweets/slicer/tweetSlice";
 import Button from "./componets/Button";
 import ProfilePic from "./profile/componets/ProfilePic";
+import EmojiPicker from 'emoji-picker-react';
+import SentimentSatisfiedAltIcon from '@mui/icons-material/SentimentSatisfiedAlt';
 
 
 interface HeaderProps {
@@ -54,12 +56,15 @@ const Header = ({ activeTab, handleTabClick }: HeaderProps) => {
 };
 
 const Home = () => {
-  const user = useAppSelector(selectUserData)
+  const BrowsingUser = useAppSelector(selectUserData)
   const dispatch = useAppDispatch()
+  const users = useAppSelector(selectUsers)
+  const BrowsingUserCreds = users.find((user) => user.id === BrowsingUser.id)
   const isLogged = useAppSelector(selectLoggedStatus)
   const [activeTab, setActiveTab] = useState("forYou")
   const [tweetText, setTweetText] = useState('')
   const [newTweet, setNewTweet] = useState(false)
+  const [emojiMode, setEmojiMode] = useState(false)
 
 
   const handleTextInput = (event: React.ChangeEvent<HTMLTextAreaElement>) => {
@@ -71,11 +76,24 @@ const Home = () => {
   };
 
   const postTweet = (text: string) => {
-    const data: any = { user_id: user.id, text: text }
+    const data: any = { user_id: BrowsingUser.id, text: text }
     dispatch(postTweetData(data));
     setNewTweet(true)
     setTweetText('')
   };
+
+  const toggleEmojis = () => {
+    emojiMode ? setEmojiMode(false) : setEmojiMode(true)
+  }
+
+  const handleEmojiClick = (emoji: any) => {
+    setTweetText((prevText) => prevText + emoji);
+  }
+
+  useEffect(() => {
+    dispatch(getUsers())
+  }, [])
+  
 
   return (
     <div>
@@ -83,25 +101,41 @@ const Home = () => {
       {isLogged && (
         <div className="relative top-2 border-b-2 border-gray-600 h-44">
           <div className="relative bottom-4">
-            <ProfilePic image={user.profile_image} className="relative top-10 left-4" />
+            <ProfilePic image={BrowsingUserCreds?.profile_image || ''} className="relative top-10 left-4" />
             <textarea
               className="bg-black border-b-1 border-gray-600 h-14 w-75 md:w-98 3xl:w-102 relative left-20 top-2 resize-none focus:outline-none"
               placeholder="What's happening today?!"
               onChange={handleTextInput}
               value={tweetText}
             />
-            <Button
-              text="Post"
-              className={`relative top-4 left-72 md:left-105 3xl:left-110 font-semibol ${tweetText.trim() === '' ? 'bg-blue-800' : 'hover:bg-blue-400'}`}
-              disabled={tweetText.trim() === ''}
-              onClick={()=> postTweet(tweetText)}
+            <SentimentSatisfiedAltIcon
+              onClick={() => toggleEmojis()}
+              className='absolute top-1/2 right-10 transform -translate-y-1/2 hover:text-gray-200 cursor-pointer'
             />
+            <Button
+              isLoading={false}
+              text="Post"
+              className={`relative top-4 left-72 md:left-105 3xl:left-110 font-semibol hover:bg-blue-800 ${tweetText.trim() === '' ? 'bg-blue-800' : 'hover:bg-blue-400'}`}
+              disabled={tweetText.trim() === ''}
+              onClick={() => postTweet(tweetText)}
+            />
+            <div className="relative top-96">
+              {emojiMode && (
+                <div style={{ position: 'absolute', bottom: '0px', right: '0', zIndex: '1' }}>
+                  <EmojiPicker
+                    width={300}
+                    height={350}
+                    onEmojiClick={(emojiObject) => handleEmojiClick(emojiObject.emoji)}
+                  />
+                </div>
+              )}
+            </div>
           </div>
         </div>
 
       )}
       <div className="relative top-5">
-        {activeTab === "forYou" ? <RecentTweets newTweet={newTweet} setNewTweet={setNewTweet} /> : <FollowingTweets  newTweet={newTweet} setNewTweet={setNewTweet} />}
+        {activeTab === "forYou" ? <RecentTweets newTweet={newTweet} setNewTweet={setNewTweet} /> : <FollowingTweets newTweet={newTweet} setNewTweet={setNewTweet} />}
       </div>
     </div>
   );

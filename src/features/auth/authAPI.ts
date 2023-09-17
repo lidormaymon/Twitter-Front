@@ -28,10 +28,11 @@ export function register(username: string, password: string, email: string, disp
   return axios.post(API_SERVER + 'register/', userData);
 }
 
-export const chkRefreshToken = (refresh:any) => {   
+export const chkRefreshToken = (refresh:string) => {   
     const data = {
         "refresh":refresh
     }
+    console.log(refresh);
     
     return axios.post(API_SERVER + 'refresh/' , data)
 }
@@ -41,9 +42,33 @@ export const getUsersData = () => {
 }
 
 export const fetchUserPostsAPI = (user_id:number) => {
-    return axios.post(API_SERVER + `user-posts/`, { user_id: user_id})
+    console.log(user_id);
+    
+    return axios.post(API_SERVER + `user-posts/`, { user_id})
 }
 
-export function searchUsersAPI(searchQuery: string) {
+export const  searchUsersAPI = (searchQuery: string) => {
   return axios.get(API_SERVER + 'search-users/?query=' + searchQuery);
+}
+
+export const editUserAPI = (user_id:number,  display_name:string, bio:string, image:File) => {
+    const userData = new FormData()
+    userData.append('display_name', display_name);
+    if (image !== null) {
+        userData.append('profile_image', image);
+    }
+    userData.append('bio', bio)
+    console.log(userData);
+    
+
+    return axios.put(API_SERVER + `user/${user_id}/`, userData)
+}
+
+export const changePwdAPI =  async (oldPWD:string, newPWD:string, user_id:number, username:string) => {
+    const response = await loginAPI(username, oldPWD)
+    console.log(response);
+    if (response.status === 200) {
+        return axios.put(API_SERVER + `user/${user_id}/`, {password:newPWD})
+    }else return 'Wrong password'
+    
 }

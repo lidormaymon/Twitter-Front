@@ -15,11 +15,19 @@ export const ProfilePosts: React.FC<profilePostProps> = ({ profile_id }) => {
   const [currentPage, setCurrentPage] = useState(1)
   const [isNextPage, setNextPage] = useState(false)
   const [sumbitEdited, setSumbitEdited] = useState(false)
+  const [isLoading, setisLoading] = useState(false)
 
   
   const loadMoreTweets = () => {
-    setCurrentPage(currentPage + 1)
-    setNextPage(true)
+    setisLoading(true)
+    try {
+      setCurrentPage(currentPage + 1)
+      setNextPage(true)
+    } catch (error) {
+      console.log(error)
+    } finally {
+      setisLoading(false)
+    }
   };
 
   useEffect(() => {
@@ -56,6 +64,7 @@ export const ProfilePosts: React.FC<profilePostProps> = ({ profile_id }) => {
           {profileTweets.length > 9 && (
             <div className="mx-auto mt-4 h-20  sm:border-b sm:border-gray-600 border-r border-l relative sm:bottom-5">
               <Button
+                isLoading={isLoading}
                 text="Load more"
                 className="relative left-38  sm:left-67 top-1 font-semibold"
                 onClick={() => loadMoreTweets()}
