@@ -67,7 +67,7 @@ export const is_converstaion_exist_async = createAsyncThunk( // CHECK IF ITS NEE
 export const postCoverstaionMessageAsync = createAsyncThunk(
     'post/message',
     async (data: any) => {
-        const response = await postCoverstaionMessageAPI(data.BrowsingUserID, data.RecipientUserID, data.inputText, data.token)
+        const response = await postCoverstaionMessageAPI(data.BrowsingUserID, data.RecipientUserID, data.token, data?.inputText, data?.image)
         return response?.data
     }
 )
@@ -105,7 +105,9 @@ export const chatsSlice = createSlice({
     initialState,
     reducers: {
         updateConversation: (state, action) => {
-            const { conversation_id, text, timestamp, sender_id, recipent_id } = action.payload
+            const { conversation_id, text, timestamp, sender_id, recipient_id } = action.payload
+            console.log('slicerrrd', action.payload);
+            
             const conversationIndex = state.ConversationAR.findIndex(
                 (conversation) => conversation.conversation.id === conversation_id
             )
@@ -120,7 +122,7 @@ export const chatsSlice = createSlice({
                 const newConversation: ConversationsAR = {
                     conversation: {
                         id: conversation_id,
-                        user1: recipent_id, 
+                        user1: recipient_id, 
                         user2: sender_id,
                         created_at: '', 
                     },

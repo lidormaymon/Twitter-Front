@@ -49,12 +49,7 @@ const FollowersList = () => {
 
   return (
     <div className='my-container'>
-      {pageNotFound ? (
-        <div className="ml-40 mt-40 sm:ml-80 sm:mt-40">
-          <p className="text-2xl font-bold">404</p>
-          <p className="relative right-10 font-semibold">Page not found :(</p>
-        </div>
-      ) : <div>
+      <div>
         <div className="flex flex-row relative top-6 mx-4">
           <ProfileHeader
             display_name={profileCreds?.display_name || ''}
@@ -62,7 +57,7 @@ const FollowersList = () => {
             profile_id={profile_id}
           />
         </div>
-        <div className="flex flex-row relative top-7 text-gray-400 cursor-pointer border-b border-gray-600">
+        <div className="flex flex-row relative top-11 text-gray-400 cursor-pointer border-b border-gray-600">
           <p onClick={() => setActiveTab('followers')} className={`w-1/2 text-center p-4 hover:bg-gray-600 ${activeTab === 'followers' && ' text-white'}`}>Followers</p>
           <p onClick={() => setActiveTab('following')} className={`w-1/2 text-center p-4 hover:bg-gray-600 ${activeTab === 'following' && ' text-white'}`}>Following</p>
         </div>
@@ -71,7 +66,7 @@ const FollowersList = () => {
             <div>
               {FollowersList.map((data: any, index) => {
                 return (
-                  <div key={index} className="relative top-10">
+                  <div key={index} className="relative top-13">
                     <FollowListForm user_list_id={data['user_id']} />
                   </div>
                 )
@@ -88,7 +83,7 @@ const FollowersList = () => {
             <div>
               {FollowingList.map((data: any, index) => {
                 return (
-                  <div key={index} className="relative top-10">
+                  <div key={index} className="relative top-13">
                     <FollowListForm user_list_id={data['user_id']} />
                   </div>
                 )
@@ -100,7 +95,7 @@ const FollowersList = () => {
             </div>
           )
         )}
-      </div>}
+      </div>
     </div>
   )
 }

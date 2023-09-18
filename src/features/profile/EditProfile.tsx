@@ -150,7 +150,7 @@ const EditProfile = () => {
               type="file"
               accept="image/jpg, image/jpeg, image/png"
               ref={hiddenFileInput}
-              style={{ display: 'none' }}
+              className='hidden'
               onChange={handleFileInputChange}
             />
           </div>

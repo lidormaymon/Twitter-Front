@@ -15,7 +15,6 @@ import {
 }
     from "./Slicer/FollowersSlice"
 import VerifiedIcon from '@mui/icons-material/Verified';
-import Loader from "../componets/Loader"
 import ProfileHeader from "./componets/ProfileHeader"
 import { Link } from "react-router-dom";
 import MailOutlineIcon from '@mui/icons-material/MailOutline';
@@ -51,7 +50,7 @@ const Profile = () => {
     const follow = () => {
         setFollowFlag(true)
         dispatch(postFolloweAsync({ from_user_id: BrowsingUser.id, to_user_id: profile_id }))
-        
+
     }
 
     const unFollow = () => {
@@ -88,14 +87,14 @@ const Profile = () => {
 
     return (
         <div>
+            <ProfileHeader
+                display_name={profileCreds?.display_name || ''}
+                is_verified={profileCreds?.is_verified || false}
+                profile_id={profile_id}
+            />
             <div>
                 <div>
                     <div className="flex flex-row relative top-6 mx-4">
-                        <ProfileHeader
-                            display_name={profileCreds?.display_name || ''}
-                            is_verified={profileCreds?.is_verified || false}
-                            profile_id={profile_id}
-                        />
                         {profileCreds?.id === BrowsingUser.id && (
                             <div className="relative left-44 sm:left-98 top-12">
                                 <Link to={`/profile/edit`}>
@@ -145,7 +144,7 @@ const Profile = () => {
                                 </div>
                             </div>
                             <p className="font-semibold text-gray-500">@{profileCreds?.username}</p>
-                            <p className="font-semibold  w-82 sm:w-102 text-sm relative top-2" style={{whiteSpace:'pre-wrap'}}>{profileCreds?.bio}</p>
+                            <p className="font-semibold  w-82 sm:w-102 text-sm relative top-2" style={{ whiteSpace: 'pre-wrap' }}>{profileCreds?.bio}</p>
                         </div>
                         <div className="flex flex-row relative top-10 space-x-3 w-72">
                             <CalendarMonthIcon className="text-gray-500" fontSize="small" />

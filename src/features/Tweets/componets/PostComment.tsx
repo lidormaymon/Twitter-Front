@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react"
+import { useEffect, useRef, useState } from "react"
 import { useAppDispatch, useAppSelector } from "../../../app/hooks"
 import ProfilePic from "../../profile/componets/ProfilePic"
 import { getUsers, selectUserData, selectUsers } from "../../auth/authSlice"
@@ -6,6 +6,8 @@ import Button from "../../componets/Button"
 import { postCommentAsync } from "../slicer/tweetSlice"
 import SentimentSatisfiedAltIcon from '@mui/icons-material/SentimentSatisfiedAlt';
 import EmojiPicker from 'emoji-picker-react';
+import ImageIcon from '@mui/icons-material/Image';
+import CloseIcon from '@mui/icons-material/Close';
 
 
 interface CommentProps {
@@ -22,15 +24,43 @@ const PostComment: React.FC<CommentProps> = ({ className, tweet_id, comments, se
   const BrowsingUserCreds = users.find((user) => user.id === BrowsingUser.id)
   const [commentText, setCommentText] = useState('')
   const [emojiMode, setEmojiMode] = useState(false)
+  const hiddenFileInput = useRef<HTMLInputElement | null>(null)
+  const [selectedFile, setSelectedFile] = useState<File | null>(null)
 
   const handleTextInput = (event: React.ChangeEvent<HTMLTextAreaElement>) => {
     setCommentText(event.target.value);
   }
 
+  const handleFileInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (file) {
+      setSelectedFile(file)
+    } else {
+      setSelectedFile(null);
+    }
+  };
+
+
+  const triggerFileInput = () => {
+    if (hiddenFileInput.current) {
+      hiddenFileInput.current.click()
+    }
+  }
+
+  const isButtonDisabled = () => {
+    if (commentText.trim() === "" && selectedFile === null) {
+      return true
+    }
+  };
+
   const commentTweet = (text: string) => {
-    const data = { text, user_id: BrowsingUser.id, tweet_id, comments }
-    console.log(data);
-    dispatch(postCommentAsync(data))
+    if (selectedFile === null) {
+      const data = { text, user_id: BrowsingUser.id, tweet_id, comments }
+      dispatch(postCommentAsync(data))
+    }else {
+      const data = { text, user_id: BrowsingUser.id, tweet_id, comments, image:selectedFile }
+      dispatch(postCommentAsync(data))
+    }
     if (setnewComment) {
       setnewComment(true)
     }
@@ -48,7 +78,7 @@ const PostComment: React.FC<CommentProps> = ({ className, tweet_id, comments, se
   useEffect(() => {
     dispatch(getUsers())
   }, [])
-  
+
 
   return (
     <div className={`container border-t border-gray-600 ${className}`}>
@@ -77,11 +107,25 @@ const PostComment: React.FC<CommentProps> = ({ className, tweet_id, comments, se
           onClick={() => toggleEmojis()}
           className='relative left-60 top-7 sm:left-102 hover:text-gray-200 cursor-pointer'
         />
+        <ImageIcon onClick={triggerFileInput} className="relative top-7 left-10 cursor-pointer" />
+        <input
+          ref={hiddenFileInput}
+          className="hidden"
+          type="file"
+          onChange={handleFileInputChange}
+          accept="image/jpg, image/jpeg, image/png"
+        />
+        {selectedFile && (
+          <>
+            <CloseIcon onClick={() => setSelectedFile(null)} className="absolute top-18 left-44 cursor-pointer" />
+            <img src={URL.createObjectURL(selectedFile)} alt="Selected" className="absolute top-18 left-28 h-14 w-14" />
+          </>
+        )}
         <Button
           isLoading={false}
           text="Post"
-          className={`h-8 w-20 relative left-67 md:h-10 md:w-20 md:left-105 ${commentText.trim() === '' ? 'bg-blue-800' : 'hover:bg-blue-400'}`}
-          disabled={commentText.trim() === ''}
+          className={`h-8 w-20 relative left-67 md:h-10 md:w-20 md:left-105 ${isButtonDisabled() ? 'bg-blue-800' : 'hover:bg-blue-400'}`}
+          disabled={isButtonDisabled()}
           onClick={() => commentTweet(commentText)}
         />
       </div>

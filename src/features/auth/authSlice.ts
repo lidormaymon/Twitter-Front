@@ -125,6 +125,7 @@ export const authSlice = createSlice({
         logOut(state) {
             localStorage.removeItem('token')
             sessionStorage.removeItem('refresh')
+            location.reload()
             state.is_logged = false
             state.is_staff = false
         },

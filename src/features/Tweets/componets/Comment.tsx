@@ -12,6 +12,7 @@ import { getCommentLikes, queryTweetCommentsLikesAsync, selectCommentLikes, twee
 import { useNavigate } from "react-router-dom"
 import { useEffect, useState } from "react"
 import { Link } from "react-router-dom";
+import DisplayImage from "../../componets/DisplayImage"
 
 
 interface CommentProps {
@@ -23,7 +24,8 @@ interface CommentProps {
         user_id: number,
         tweet_id: number,
         liked_by_me: false,
-        comments: number
+        comments: number,
+        image: string
     }
 }
 
@@ -45,51 +47,51 @@ const Comment: React.FC<CommentProps> = ({ tweet_comments }) => {
             ? formatDistanceToNow(parsedDate, { addSuffix: false }) // if it is using formatdistancenow to display is as hr/mins/seconds ago
             : parsedDate.toLocaleDateString()
 
-    const likeComment = (likes:number, comment_id:number) => {
+    const likeComment = (likes: number, comment_id: number) => {
         console.log('like');
         setNewLike(true)
-        const data = { likes, comment_id, user_id:BrowsingUserID}
+        const data = { likes, comment_id, user_id: BrowsingUserID }
         if (BrowsingUser.is_logged) {
             dispatch(tweetCommentLikeAsync(data))
-        }else{
+        } else {
             navigate('/login')
         }
     }
 
     const unLike = (comment_id: number, likes: number) => {
         console.log('unlike');
-        
+
         const index = likes_data.findIndex(
-          (like) => like.user_id === BrowsingUserID && like.comment_id === comment_id
+            (like) => like.user_id === BrowsingUserID && like.comment_id === comment_id
         )
         console.log(index);
-        
+
         const like_id = likes_data[index]['id']
         console.log('Found like ID:', like_id);
         try {
-          dispatch(unlikeTweetCommentAsync({ like_id, comment_id, likes }))
+            dispatch(unlikeTweetCommentAsync({ like_id, comment_id, likes }))
         } catch (error) {
-          console.log('An error occured while trying to unlike this tweet', error);
-    
+            console.log('An error occured while trying to unlike this tweet', error);
+
         }
-      }
-    
+    }
+
     useEffect(() => {
         if (newLike) {
             setNewLike(false)
         }
-      dispatch(getCommentLikes())
+        dispatch(getCommentLikes())
     }, [newLike])
-    
+
 
     useEffect(() => {
         if (newLike) { //adding this if statement, so if user tries to like and unlike again,
             setNewLike(false) // it'd retrive the new data of likes
         }
         if (BrowsingUser.is_logged) {
-            dispatch(queryTweetCommentsLikesAsync({BrowsingUserID, comment_id}))
+            dispatch(queryTweetCommentsLikesAsync({ BrowsingUserID, comment_id }))
         }
-      }, [BrowsingUser.is_logged, BrowsingUserID, comment_id,  likedByMe])
+    }, [BrowsingUser.is_logged, BrowsingUserID, comment_id, likedByMe])
 
 
     return (
@@ -117,14 +119,23 @@ const Comment: React.FC<CommentProps> = ({ tweet_comments }) => {
                     </div>
                 </div>
                 <div className="relative left-20 bottom-5 w-72">
-                    {tweet_comments.text}
+                    {tweet_comments.image === null ? (
+                        <p>{tweet_comments.text}</p>
+                    ) : (
+                        <>
+                            <DisplayImage image={tweet_comments.image} />
+                            {tweet_comments.text.trim() !== "" && (
+                                <p>{tweet_comments.text}</p>
+                            )}
+                        </>
+                    )}
                 </div>
                 <div className="flex mx-20 space-x-2">
                     <p>{tweet_comments.likes}</p>
                     {tweet_comments.liked_by_me ? (
-                        <FavoriteIcon onClick={()=> unLike(tweet_comments.id, tweet_comments.likes)} className="text-red-500 cursor-pointer" />
+                        <FavoriteIcon onClick={() => unLike(tweet_comments.id, tweet_comments.likes)} className="text-red-500 cursor-pointer" />
                     ) : (
-                        <FavoriteBorderIcon onClick={()=> likeComment(tweet_comments.likes, tweet_comments.id)} className="cursor-pointer hover:text-red-500" />
+                        <FavoriteBorderIcon onClick={() => likeComment(tweet_comments.likes, tweet_comments.id)} className="cursor-pointer hover:text-red-500" />
                     )}
                     <p>{tweet_comments.comments}</p>
                     <ChatBubbleOutlineIcon />

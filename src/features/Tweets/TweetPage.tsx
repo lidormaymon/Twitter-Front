@@ -17,6 +17,7 @@ import BackButton from "../componets/BackButton"
 import { Link } from "react-router-dom";
 import Button from "../componets/Button"
 import { ViewLikes } from "./componets/ViewLikes"
+import TweetImage from "../componets/DisplayImage"
 
 
 
@@ -54,7 +55,7 @@ const TweetPage = () => {
       navigate('/login')
     }
   }
-  console.log(tweets);
+  console.log(tweet_comments);
 
 
   const unLike = (tweet_id: number, likes: number) => {
@@ -131,7 +132,7 @@ const TweetPage = () => {
     }
   }, [tweet_id, BrowsingUser.is_logged, likedByMe, BrowsingUserID])
 
-  if (!tweetData || !tweetData.user_id) {
+  if (tweetData === undefined || tweet_comments === undefined) {
     return <div className="relative left-44 top-44 sm:left-72"><Loader isTextLoading={true} /></div>; // Render a loading indicator
   }
 
@@ -207,9 +208,10 @@ const TweetPage = () => {
         ) : (
           <>
             <p className="relative left-14 bottom-8">{tweetData.text}</p>
+            <div className="relative left-14"><TweetImage image={tweetData.image}  /></div>
           </>
         )}
-        <div className="flex w-40 flex-row gap-x-4 relative left-14">
+        <div className="flex w-40 flex-row gap-x-4 relative left-14 top-2">
           <p onClick={() => toggleLikesView()} className="cursor-pointer">{tweetData.likes}</p>
           {likedByMe ? (
             <div>

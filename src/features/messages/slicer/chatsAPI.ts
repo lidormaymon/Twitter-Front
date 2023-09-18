@@ -9,7 +9,7 @@ export const isConverstaionExistAPI = (BrowsingUserID:number, RecipientUserID:nu
     return axios.post(API_SERVER + 'is-conversation-exist/', data)
 }
 
-export const postCoverstaionMessageAPI = async (browsingUserID:number, RecipientID:number, messageContent:number, token:string) => {
+export const postCoverstaionMessageAPI = async (browsingUserID:number, RecipientID:number, token:string, messageContent?:string, image?:File ) => {
     try {
         // Check if the conversation already exists
         const response = await isConverstaionExistAPI(browsingUserID, RecipientID);
@@ -17,8 +17,12 @@ export const postCoverstaionMessageAPI = async (browsingUserID:number, Recipient
         if (response.data.conversation_exists) {
             // If the conversation exists, get the conversation ID
             const conversation_id = response.data.id;
-            const data = { text: messageContent, conversation_id, sender_id:browsingUserID }
-
+            const data = new FormData()
+            messageContent !== undefined && data.append('text', messageContent)
+            image !== undefined && data.append('image', image)
+            data.append('conversation_id', conversation_id)
+            data.append('sender_id', browsingUserID.toString())
+            
             // Post the message to the existing conversation
             return axios.post(API_SERVER + `messages/`, data , {
                 headers: {
@@ -34,7 +38,11 @@ export const postCoverstaionMessageAPI = async (browsingUserID:number, Recipient
 
             // Get the conversation ID from the response
             const conversation_id = conversationResponse.data.id;
-            const data = { text: messageContent, conversation_id, sender_id:browsingUserID }
+            const data = new FormData()
+            messageContent !== undefined && data.append('text', messageContent)
+            image !== undefined && data.append('image', image)
+            data.append('conversation_id', conversation_id)
+            data.append('sender_id', browsingUserID.toString())
 
             // Post the message to the newly created conversation
             return axios.post(API_SERVER + `messages/`, data, {

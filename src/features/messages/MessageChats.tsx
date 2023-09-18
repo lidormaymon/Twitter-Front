@@ -11,6 +11,9 @@ import { fetchMessagesAsync, findConversationIDAsync, postCoverstaionMessageAsyn
 import MessageForm from './MessageForm'
 import SentimentSatisfiedAltIcon from '@mui/icons-material/SentimentSatisfiedAlt';
 import EmojiPicker from 'emoji-picker-react';
+import ImageIcon from '@mui/icons-material/Image';
+import CloseIcon from '@mui/icons-material/Close';
+import Button from '../componets/Button'
 
 
 const MessageChats = () => {
@@ -24,11 +27,14 @@ const MessageChats = () => {
   const users = useAppSelector(selectUsers)
   const recipientCreds = users.find((user) => user.id === RecipientUserID)
   const [inputText, setInputText] = useState('')
-  const messages = useAppSelector(selectMessages)
+  const historyMessages = useAppSelector(selectMessages)
   const tokenString = localStorage.getItem('token')
   const token = tokenString ? JSON.parse(tokenString) : null
   const [conversation_id, setConversation_id] = useState(0)
   const chatSocket = new WebSocket(`ws://localhost:8000/ws/chat/${conversation_id}/`)
+  const hiddenFileInput = useRef<HTMLInputElement | null>(null)
+  const [selectedFile, setSelectedFile] = useState<File | null>(null)
+  const chatContainerRef = useRef<HTMLDivElement | null>(null);
 
   const [emojiMode, setEmojiMode] = useState(false)
   const [recieveMessages, setrecieveMessages] = useState<{
@@ -37,19 +43,59 @@ const MessageChats = () => {
     timestamp: string
   }[]>([])
 
-
+  console.log(historyMessages);
+  
 
   const handleInputText = (event: React.ChangeEvent<HTMLTextAreaElement>) => {
     setInputText(event.target.value)
   }
 
-  const postMessage = () => {
-    dispatch(postCoverstaionMessageAsync({ BrowsingUserID, RecipientUserID, inputText, token }))
-    const text = inputText
-    const sender_id = BrowsingUserID
-    const recipient_id = RecipientUserID
-    const timestamp = new Date().toISOString();
-    chatSocket.send(JSON.stringify({ text, sender_id, conversation_id, timestamp, recipient_id }))
+  const handleFileInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (file) {
+      setSelectedFile(file)
+    } else {
+      setSelectedFile(null);
+    }
+  };
+
+  // Function to trigger the hidden file input
+  const triggerFileInput = () => {
+    if (hiddenFileInput.current) {
+      hiddenFileInput.current.click();
+    }
+  };
+
+  const postMessage = async () => {
+    if (selectedFile !== null || inputText.trim() !== "") {
+      if (selectedFile === null) {
+        const data = { BrowsingUserID, RecipientUserID, inputText, token }
+        const response = await dispatch(postCoverstaionMessageAsync(data))
+        console.log(response);
+        if (response.type === 'post/message/fulfilled') {
+          const text = inputText
+          const sender_id = BrowsingUserID
+          const conversation_id = response.payload.conversation_id
+          const recipient_id = RecipientUserID
+          const timestamp = new Date().toISOString();
+          chatSocket.send(JSON.stringify({ text, sender_id, conversation_id, timestamp, recipient_id }))
+        }
+      }else {
+        const data = { BrowsingUserID, RecipientUserID, inputText, token, image:selectedFile }
+        const response = await dispatch(postCoverstaionMessageAsync(data))
+        console.log(response);
+        if (response.type === 'post/message/fulfilled') {
+          const text = inputText
+          const sender_id = BrowsingUserID
+          const conversation_id = response.payload.conversation_id
+          const recipient_id = RecipientUserID
+          const timestamp = new Date().toISOString();
+          const image = response.payload.image
+          chatSocket.send(JSON.stringify({ text, sender_id, conversation_id, timestamp, recipient_id, image:image }))
+        }
+      }
+    }
+    setSelectedFile(null)
     setInputText('')
   }
 
@@ -64,7 +110,7 @@ const MessageChats = () => {
     emojiMode ? setEmojiMode(false) : setEmojiMode(true)
   }
 
-  const handleEmojiClick = (emoji:any) => {
+  const handleEmojiClick = (emoji: any) => {
     setInputText((prevText) => prevText + emoji);
   };
 
@@ -78,10 +124,12 @@ const MessageChats = () => {
       const sender_id = data.sender_id;
       const timestamp = data.timestamp
       const conversation_id = data.conversation_id
+      const image = data.image
       console.log(data);
+
       setrecieveMessages((prevMessages) => [
         ...prevMessages,
-        { text, sender_id, timestamp, conversation_id }
+        { text, sender_id, timestamp, conversation_id, image }
       ]);
     };
 
@@ -110,7 +158,9 @@ const MessageChats = () => {
     }
   }, [RecipientUserID, BrowsingUserID]);
 
+  useEffect(() => {
 
+  }, [selectedFile])
 
 
   useEffect(() => {
@@ -120,11 +170,17 @@ const MessageChats = () => {
   }, [BrowsingUser.is_logged, isLoading])
 
   useEffect(() => {
-    // Simulate loading of authentication state (replace with actual logic)
-    setTimeout(() => {
+    setTimeout(() => { // giving a delay here using timeout so it'd finish fetching user data
       setIsLoading(false);
-    }, 1000); // Adjust the delay as needed
-  }, []);
+    }, 1000);
+  }, [])
+
+  useEffect(() => {
+    // After rendering messages, scroll to the bottom of the chat container
+    if (chatContainerRef.current) {
+      chatContainerRef.current.scrollTop = chatContainerRef.current.scrollHeight;
+    }
+  }, [historyMessages, recieveMessages]); // Add messages and recieveMessages as dependencies
 
 
   if (isLoading) {
@@ -138,7 +194,7 @@ const MessageChats = () => {
       <div className='flex'>
         <ConversationList conversation_id={conversation_id} />
         {location.pathname.startsWith('/messages/') && (
-          <div className='px-4 py-3 flex flex-col w-95 sm:w-full'>
+          <div className='px-4 py-3 flex flex-col w-95 sm:w-full'> {/* i want to make here only when socke is oconnect o display all of it */}
             <div className='flex flex-row'>
               <ProfilePic image={recipientCreds?.profile_image || ''} width={'45px'} />
               <Link to={`/profile/${recipientCreds?.id}`}>
@@ -148,10 +204,15 @@ const MessageChats = () => {
                 <VerifiedIcon className='relative right-2' />
               )}
             </div>
-            <div className='h-114 sm:h-110 3xl:h-125 overflow-y-scroll scroll-smooth scroll-into-view-bot scroll custom-scrollbar'>
-              {messages.length > 0 && (
+            <div className='h-114 sm:h-107 max-h-fit 3xl:h-125  overflow-y-scroll scroll-smooth scroll-into-view-bot scroll custom-scrollbar' ref={chatContainerRef}>
+              {historyMessages.length > 0 && (
                 <>
-                  {messages.slice().reverse().map((data: any, index: any) => {
+                  {historyMessages.length > 9 && (
+                    <div className='flex flex-row justify-center'>
+                      <Button text='Load more' isLoading={false} />
+                    </div>
+                  )}
+                  {historyMessages.slice().reverse().map((data: any, index: any) => {
                     return (
                       <MessageForm messages={data} key={index} />
                     );
@@ -172,30 +233,50 @@ const MessageChats = () => {
               <div className="relative w-full">
                 <div className="relative">
                   {emojiMode && (
-                    <div style={{ position: 'absolute', bottom: '50px', right: '0', zIndex: '1' }}>
-                      <EmojiPicker 
-                        width={300} 
-                        height={350} 
+                    <div className='absolute bottom-[50px] right-0 z-10' >
+                      <EmojiPicker
+                        width={300}
+                        height={350}
                         onEmojiClick={(emojiObject) => handleEmojiClick(emojiObject.emoji)}
                       />
                     </div>
                   )}
                 </div>
-                <textarea
-                  onKeyPress={(event) => handleTextareaKeyPress(event)}
-                  onChange={(event) => handleInputText(event)}
-                  value={inputText}
-                  className="bg-black border-1 border-gray-600 rounded-full w-full focus:outline-none pl-8 pr-16 pt-4 overflow-y-hidden"
-                  placeholder="Enter a message"
-                />
-                <SentimentSatisfiedAltIcon
-                  onClick={() => toggleEmojis()}
-                  className='absolute top-1/2 right-10 transform -translate-y-1/2 hover:text-gray-200 cursor-pointer'
-                />
-                <SendIcon
-                  onClick={postMessage}
-                  className="absolute top-1/2 right-2 transform -translate-y-1/2 hover:text-gray-200 cursor-pointer"
-                />
+                <div className='bg-black border-1 border-gray-600 rounded-full h-fit w-full pl-8 pr-16 pt-4 overflow-y-hidden'>
+                  {selectedFile && (
+                    <>
+                      <CloseIcon onClick={() => setSelectedFile(null)} className="relative cursor-pointer" />
+                      <img src={URL.createObjectURL(selectedFile)} alt="Selected" className="relative h-14 w-14" />
+                    </>
+                  )}
+                  <textarea
+                    onKeyPress={(event) => handleTextareaKeyPress(event)}
+                    onChange={(event) => handleInputText(event)}
+                    value={inputText}
+                    className="bg-black w-full focus:outline-none "
+                    placeholder="Enter a message"
+                  />
+                </div>
+                <div>
+                  <SentimentSatisfiedAltIcon
+                    onClick={() => toggleEmojis()}
+                    className='relative bottom-10 left-74 sm:left-109 transform -translate-y-1/2 hover:text-gray-200 cursor-pointer'
+                  />
+                  <SendIcon
+                    onClick={postMessage}
+                    className="relative bottom-10 left-65 sm:left-102 transform -translate-y-1/2 hover:text-gray-200 cursor-pointer"
+                  />
+                </div>
+                <div className='flex relative bottom-4 sm:bottom-6'>
+                  <ImageIcon onClick={triggerFileInput} className='relative left-2 cursor-pointer' />
+                  <input
+                    onChange={handleFileInputChange}
+                    className="hidden"
+                    ref={hiddenFileInput}
+                    type="file"
+                    accept="image/jpg, image/jpeg, image/png"
+                  />
+                </div>
               </div>
             </div>
           </div>

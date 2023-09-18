@@ -15,7 +15,7 @@ import RightSide from "./features/RightSide";
 import SearchMobile from "./features/componets/Search/SearchMobile";
 import MessageChats from "./features/messages/MessageChats";
 import EditProfile from "./features/profile/EditProfile";
-import { GoogleOAuthProvider } from '@react-oauth/google';
+
 import { Error404 } from "./features/componets/Error404";
 import Loader from "./features/componets/Loader";
 import { ChangePWD } from "./features/auth/ChangePWD";
@@ -68,7 +68,7 @@ function App() {
 
   return (
     <div>
-      <div className={`flex flex-col sm:flex-row container sm:ml-80 3xl:ml-96  h-screen ${noScrollPage && 'overflow-y-hidden'}`}>
+      <div className={`flex flex-col sm:flex-row container xl:ml-80 3xl:ml-96  min-h-screen ${noScrollPage && 'overflow-y-hidden'}`}>
         <SideNav />
         <MobileMenu />
         <div className={`${!authPages && 'my-container'} `}>

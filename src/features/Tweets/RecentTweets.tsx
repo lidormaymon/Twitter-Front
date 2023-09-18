@@ -62,7 +62,7 @@ const RecentTweets: React.FC<RecentTweetsProps> = ({ newTweet, setNewTweet }) =>
         <>
           {tweets.map((data: any, index: any) => {
             return (
-              <div key={index}>
+              <div key={index} className="relative top-7">
                 <TweetForm
                   tweet_data={data}
                   setSumbitEdited={setSumbitEdited}
@@ -82,7 +82,7 @@ const RecentTweets: React.FC<RecentTweetsProps> = ({ newTweet, setNewTweet }) =>
           )}
         </>
       ) : (
-        <div className="relative sm:bottom-5 sm:h-105 sm:border-b 3xl:h-120 sm:border-gray-600">
+        <div className="relative top-8 sm:h-105 sm:border-b 3xl:h-120 sm:border-gray-600">
           <p className="mx-4 relative top-3 text-center">No tweets have been posted yet.</p>
         </div>
       )}

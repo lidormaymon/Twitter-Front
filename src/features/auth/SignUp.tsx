@@ -21,7 +21,7 @@ const SignUp = () => {
     password: "",
     con_pwd: "",
     email: "",
-    image: File
+    image: ''
   });
 
   const handleInputChange = (event: any) => {

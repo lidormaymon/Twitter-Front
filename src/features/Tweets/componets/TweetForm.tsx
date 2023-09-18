@@ -13,6 +13,7 @@ import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
 import PostComment from "./PostComment";
 import Button from "../../componets/Button";
 import { ViewLikes } from "./ViewLikes";
+import TweetImage from "../../componets/DisplayImage";
 
 
 
@@ -25,7 +26,8 @@ interface TweetFormProps {
     text: string,
     user_id: number,
     liked_by_me: boolean,
-    edit: boolean
+    edit: boolean,
+    image:string
   },
   setSumbitEdited?: React.Dispatch<React.SetStateAction<boolean>>
 }
@@ -62,6 +64,9 @@ const TweetForm: React.FC<TweetFormProps> = ({ tweet_data, setSumbitEdited }) =>
       navigate('/login')
     }
   }
+
+
+
 
   const unLike = (tweet_id: number, likes: number, event: React.MouseEvent) => {
     event.preventDefault()
@@ -138,6 +143,8 @@ const TweetForm: React.FC<TweetFormProps> = ({ tweet_data, setSumbitEdited }) =>
   }
 
 
+  
+
   useEffect(() => {
     if (newLike) { //adding this if statement, so if user tries to like and unlike again, it'd retrive the new data of likes
       setNewLike(false)
@@ -158,7 +165,7 @@ const TweetForm: React.FC<TweetFormProps> = ({ tweet_data, setSumbitEdited }) =>
       {likesViewFlag && (
         <ViewLikes setlikesViewFlag={setlikesViewFlag} tweet_id={tweet_id} />
       )}
-      <div className="border-b-2 border-gray-600 w-full shrink relative  sm:bottom-5 ">
+      <div className="border-b-2 border-gray-600 h-fit w-full shrink relative  sm:bottom-5 ">
         <Link to={`/tweet-post/${tweet_id}`}>
           <div className="container  w-95  sm:w-97% p-6 sm:p-8 max-h-max ">
             <div className="flex flex-row flex-shrink">
@@ -232,11 +239,12 @@ const TweetForm: React.FC<TweetFormProps> = ({ tweet_data, setSumbitEdited }) =>
               ) : (
                 <>
                   <p>{tweet_data.text}</p>
+                  <TweetImage image={tweet_data.image} />
                 </>
               )}
             </div>
             <div className="flex w-40 flex-row gap-x-4 relative left-14 top-5 sm:top-7">
-              <p onClick={(event) => toggleLikesView(event)}>{tweet_data.likes}</p>
+              <p className="relative bottom-1 p-1" onClick={(event) => toggleLikesView(event)}>{tweet_data.likes}</p>
               {likedByMe ? (
                 <div>
                   <FavoriteIcon

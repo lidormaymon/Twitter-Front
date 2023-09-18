@@ -20,7 +20,8 @@ export interface TweetsTemp {
     likes: number
     text: string
     liked_by_me: boolean,
-    edit: boolean
+    edit: boolean,
+    image:string
 }
 export interface TweetsLikeTemp {
     id: number,
@@ -37,7 +38,8 @@ export interface TweetCommentTemp {
     created_time: string,
     user_id: number,
     tweet_id: number,
-    liked_by_me: boolean
+    liked_by_me: boolean,
+    image:string
 }
 
 export interface TweetCommentLikeTemp {
@@ -71,7 +73,7 @@ const initialState: Tweets = {
 export const postTweetData = createAsyncThunk(
     'tweet/post',
     async (data: any) => {
-        const response = await postTweet(data.text, data.user_id)
+        const response = await postTweet(data.user_id, data?.text, data?.image)
         return response.data
     }
 )
@@ -220,7 +222,7 @@ export const getPageComments = createAsyncThunk(
 export const postCommentAsync = createAsyncThunk(
     'post/comment',
     async (data: any) => {
-        const response = await postCommentAPI(data.text, data.user_id, data.tweet_id, data.comments)
+        const response = await postCommentAPI(data.user_id, data.tweet_id, data.comments, data?.text, data?.image)
         return response
     }
 )

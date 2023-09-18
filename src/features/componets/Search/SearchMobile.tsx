@@ -12,18 +12,18 @@ const SearchMobile = () => {
     const [queryUsers, setQueryUsers] = useState([])
     const users = useAppSelector(selectUsers)
     const [isClicked, setIsClicked] = useState(false)
-  
+
     const handleSearchInput = (event: any) => {
-      const query = event.target.value
-      setSearchQuery(query);
-      dispatch(searchUsers(query)).then((res: any) => setQueryUsers(res.payload.usernames))
+        const query = event.target.value
+        setSearchQuery(query);
+        dispatch(searchUsers(query)).then((res: any) => setQueryUsers(res.payload.usernames))
     };
-  
+
     useEffect(() => {
-      dispatch(getUsers())
-      if (isClicked) {
-        setIsClicked(false)
-      }
+        dispatch(getUsers())
+        if (isClicked) {
+            setIsClicked(false)
+        }
     }, [queryUsers])
     return (
         <div className='my-container'>
@@ -40,31 +40,35 @@ const SearchMobile = () => {
 
             {/* Display the matching users */}
             <div>
-                {queryUsers.length > 0 && (
-                    <div className='relative top-5 left-4  bg-gray-900 rounded-3xl w-68'>
-                        {queryUsers.map((id: number) => {
-                            const user = users.find((user) => user.id === id);
-                            if (user) {
-                                return (
-                                    <div key={user.id} className='flex items-center my-5 '>
-                                        <Link
-                                            to={`/profile/${user.id}`}
-                                            className='hover:bg-gray-600 w-full rounded-3xl'
-                                            onClick={() => setIsClicked(true)}>
-                                            <div className='flex flex-row mx-2 bg'>
-                                                <ProfilePic
-                                                    width={'45px'}
-                                                    image={user.profile_image}
-                                                    alt={`${user.username}'s profile`}
-                                                />
-                                                <p className='relative left-2 top-2'>{user.username}</p>
+                {searchQuery.trim() !== '' && (
+                    <>
+                        {queryUsers.length > 0 && (
+                            <div className='relative top-5 left-4  bg-gray-900 rounded-3xl w-68'>
+                                {queryUsers.map((id: number) => {
+                                    const user = users.find((user) => user.id === id);
+                                    if (user) {
+                                        return (
+                                            <div key={user.id} className='flex items-center my-5 '>
+                                                <Link
+                                                    to={`/profile/${user.id}`}
+                                                    className='hover:bg-gray-600 w-full rounded-3xl'
+                                                    onClick={() => setIsClicked(true)}>
+                                                    <div className='flex flex-row mx-2 bg'>
+                                                        <ProfilePic
+                                                            width={'45px'}
+                                                            image={user.profile_image}
+                                                            alt={`${user.username}'s profile`}
+                                                        />
+                                                        <p className='relative left-2 top-2'>{user.username}</p>
+                                                    </div>
+                                                </Link>
                                             </div>
-                                        </Link>
-                                    </div>
-                                );
-                            }
-                        })}
-                    </div>
+                                        );
+                                    }
+                                })}
+                            </div>
+                        )}
+                    </>
                 )}
             </div>
         </div>

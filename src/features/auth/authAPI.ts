@@ -23,7 +23,9 @@ export function register(username: string, password: string, email: string, disp
   userData.append('password', password);
   userData.append('email', email);
   userData.append('display_name', display_name);
-  userData.append('image', image);
+  userData.append('image', image)
+
+  
 
   return axios.post(API_SERVER + 'register/', userData);
 }
@@ -56,7 +58,7 @@ export const editUserAPI = (user_id:number,  display_name:string, bio:string, im
     userData.append('display_name', display_name);
     if (image !== null) {
         userData.append('profile_image', image);
-    }
+    }else userData.append('image', '')
     userData.append('bio', bio)
     console.log(userData);
     

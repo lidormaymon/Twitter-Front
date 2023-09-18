@@ -26,7 +26,7 @@ textarea {
 }
 
 .links {
-  @apply  text-2xl relative right-5 p-2 pl-4 bottom-3 hover:font-semibold w-auto text-center h-12 cursor-pointer
+  @apply  flex  text-2xl relative right-5 p-2 pl-4 bottom-3 hover:font-semibold w-auto text-center h-12 cursor-pointer
   hover:transition-colors  hover:duration-500 hover:ease-in-out hover:bg-gray-700 hover:rounded-full
 }
 

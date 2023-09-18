@@ -5,6 +5,7 @@ import { fetchUserConversationsAsync, selectConverstaionsAR, updateConversation 
 import ProfilePic from '../profile/componets/ProfilePic'
 import { Link } from 'react-router-dom'
 import { formatDistanceToNow, parseISO } from 'date-fns';
+import ImageIcon from '@mui/icons-material/Image';
 
 
 interface ConversationListFormsProps {
@@ -19,7 +20,8 @@ interface ConversationListFormsProps {
       sender_id: number,
       text: string,
       timestamp: string,
-      conversation_id: number
+      conversation_id: number,
+      image:string
     }
 
   }
@@ -58,7 +60,17 @@ const ConversationsListForm: React.FC<ConversationListFormsProps> = ({ data }) =
                 <p className='flex justify-end text-xs text-gray-400'>{formattedDate}</p>
               </div>
               <p className='mx-4 font-serif'>{last_message.sender_id === BrowsingUser.id ? (
-                <p className='flex gap-x-1'><p className='text-gray-400 font-semibold'>You:</p>{last_message.text}</p>
+                <p className='flex gap-x-1'><p className='text-gray-400 font-semibold'>You:</p>
+                {last_message.image !== null ? (
+                  <>
+                    <p><ImageIcon />Image</p>
+                  </>
+                ) : (
+                  <>
+                    {last_message.text}
+                  </>
+                )}
+              </p>
               ) : (
                 <p>{last_message.text}</p>
               )}</p>
@@ -81,26 +93,25 @@ export const ConversationList: React.FC<ConversationListProps> = ({ conversation
   const tokenString = localStorage.getItem('token')
   const conversations = useAppSelector(selectConverstaionsAR)
   const chatSocket = new WebSocket(`ws://localhost:8000/ws/chat/${conversation_id}/`)
-  console.log(conversations);
 
   
 
   useEffect(() => {
-    const chatSocket = new WebSocket(`ws://localhost:8000/ws/chat/${conversation_id}/`);
+    const chatSocket = new WebSocket(`ws://localhost:8000/ws/chat/${conversation_id}/`)
 
     chatSocket.onmessage = function (e) {
-      const data = JSON.parse(e.data);
-      const text = data.text;
-      const sender_id = data.sender_id;
-      const timestamp = data.timestamp;
-      const conversation_id = data.conversation_id;
-
+      const data = JSON.parse(e.data)
+      const text = data.text
+      const sender_id = data.sender_id
+      const timestamp = data.timestamp
+      const conversation_id = data.conversation_id
+      const recipient_id = data.recipient_id
       // Dispatch the updateConversation action to update or add the conversation
-      dispatch(updateConversation({ conversation_id, text, timestamp, sender_id }));
+      dispatch(updateConversation({ conversation_id, text, timestamp, sender_id, recipient_id }))
     };
 
     chatSocket.onclose = function (event) {
-      console.log("Connection closed: code=" + event.code + ", reason=" + event.reason);
+      console.log("Connection closed: code=" + event.code + ", reason=" + event.reason)
     };
 
     return () => {
@@ -124,12 +135,9 @@ export const ConversationList: React.FC<ConversationListProps> = ({ conversation
 
 
   return (
-    <div className={`${location.pathname === '/messages' ? `flex border-none sm:border-solid` : 'hidden'} sm:flex flex-row border-r border-gray-600 min-h-screen h-fit w-69 3xl:w-70`}>
+    <div className={`${location.pathname === '/messages' ? `flex border-none sm:border-solid` : 'hidden'} xl:flex flex-row border-r  border-gray-600 sm:min-h-screen h-fit w-69 3xl:w-70`}>
       <div>
         <h1 className="px-5 py-5 text-2xl font-bold font-serif">Messages</h1>
-        <div>
-          SEARCH CHATS INPUT
-        </div>
         <div className='py-3'>
         {conversations.length > 0 ? (
           <>

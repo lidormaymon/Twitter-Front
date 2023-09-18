@@ -12,7 +12,6 @@ interface ViewLikesProps {
 
 export const ViewLikes: React.FC<ViewLikesProps> = ({ tweet_id, setlikesViewFlag }) => {
     const likesDataView = useAppSelector(selectViewLikes)
-    const data = likesDataView
     const dispatch = useAppDispatch()
 
     console.log(tweet_id);
