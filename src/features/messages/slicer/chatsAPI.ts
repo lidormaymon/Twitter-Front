@@ -78,3 +78,7 @@ export const fetchUserConversationsAPI = (BrowsingUserID:number, token:string) =
 export const fetchMessagesAPI = (conversation_id:number) => {
     return axios.get(API_SERVER + `page-messages/${conversation_id}/?page=1`)
 }
+
+export const fetchNextPageMessageAPI = (conversation_id:number, page:number ) => {
+    return axios.get(API_SERVER + `page-messages/${conversation_id}/?page=${page}`)
+}

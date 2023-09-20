@@ -17,7 +17,7 @@ const SideNav = () => {
 
     return (
         <div className="sm:sticky sm:top-0 h-fit self-start z-50 hidden sm:block  ">
-            <ul className="relative top-0 sm:left-3 2xl:right-8 right-20 h-full px-2 py-4">
+            <ul className="relative top-5 sm:left-3 2xl:right-8 right-20 h-full px-2 py-4">
                 <div className="relative  lg:right-2">
                     <span>
                         <Link to='/'>

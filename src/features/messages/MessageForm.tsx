@@ -11,7 +11,7 @@ interface MessageFormProps {
     conversation_id: number,
     text: string,
     timestamp: string,
-    image:string
+    image: string
   }
 }
 
@@ -46,11 +46,15 @@ const MessageForm: React.FC<MessageFormProps> = ({ messages }) => {
         <>
           <div className="flex justify-start mb-4">
             <div className="bg-gray-400 text-white p-2 rounded-lg">
-            {messages.image !== null && (
+              {messages.image !== null && (
                 <TweetImage image={messages.image} />
               )}
-              {messages.text.trim() !== "" && (
-                <p>{messages.text}</p>
+              {messages.text !== undefined && (
+                <>
+                  {messages.text.trim() !== "" && (
+                    <p>{messages.text}</p>
+                  )}
+                </>
               )}
             </div>
           </div>

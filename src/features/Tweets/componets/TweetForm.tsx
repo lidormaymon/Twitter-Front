@@ -29,11 +29,12 @@ interface TweetFormProps {
     edit: boolean,
     image:string
   },
-  setSumbitEdited?: React.Dispatch<React.SetStateAction<boolean>>
+  setSumbitEdited: React.Dispatch<React.SetStateAction<boolean>>
+  setNewComment:React.Dispatch<React.SetStateAction<boolean>>
 }
 
 
-const TweetForm: React.FC<TweetFormProps> = ({ tweet_data, setSumbitEdited }) => {
+const TweetForm: React.FC<TweetFormProps> = ({ tweet_data, setSumbitEdited, setNewComment }) => {
   const users = useAppSelector(selectUsers)
   const [newLike, setNewLike] = useState(false)
   const tweeterCreds = users.find((user: any) => user.id === tweet_data['user_id']) // getthing the user data of the poster of the tweet by using getting it from tweet_data
@@ -268,7 +269,7 @@ const TweetForm: React.FC<TweetFormProps> = ({ tweet_data, setSumbitEdited }) =>
           </div>
         </Link>
         {activeComment && (
-          <PostComment comments={tweet_data.comments} tweet_id={tweet_id} className="" />
+          <PostComment setNewComment={setNewComment} comments={tweet_data.comments} tweet_id={tweet_id} className="" />
         )}
       </div>
     </div>

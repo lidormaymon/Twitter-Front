@@ -14,10 +14,10 @@ interface CommentProps {
   tweet_id: number
   comments: number
   className: string
-  setnewComment?: React.Dispatch<React.SetStateAction<boolean>>
+  setNewComment: React.Dispatch<React.SetStateAction<boolean>>
 }
 
-const PostComment: React.FC<CommentProps> = ({ className, tweet_id, comments, setnewComment }) => {
+const PostComment: React.FC<CommentProps> = ({ className, tweet_id, comments, setNewComment }) => {
   const dispatch = useAppDispatch()
   const BrowsingUser = useAppSelector(selectUserData)
   const users = useAppSelector(selectUsers)
@@ -61,9 +61,8 @@ const PostComment: React.FC<CommentProps> = ({ className, tweet_id, comments, se
       const data = { text, user_id: BrowsingUser.id, tweet_id, comments, image:selectedFile }
       dispatch(postCommentAsync(data))
     }
-    if (setnewComment) {
-      setnewComment(true)
-    }
+    setNewComment(true)
+    setSelectedFile(null)
     setCommentText('')
   }
 

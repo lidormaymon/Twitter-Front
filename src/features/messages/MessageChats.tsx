@@ -7,13 +7,14 @@ import Loader from '../componets/Loader'
 import ProfilePic from '../profile/componets/ProfilePic'
 import VerifiedIcon from '@mui/icons-material/Verified';
 import SendIcon from '@mui/icons-material/Send';
-import { fetchMessagesAsync, findConversationIDAsync, postCoverstaionMessageAsync, selectMessages } from './slicer/chatsSlicer'
+import { fetchMessagesAsync, fetchNextPageMessageAsync, findConversationIDAsync, postCoverstaionMessageAsync, selectMessages } from './slicer/chatsSlicer'
 import MessageForm from './MessageForm'
 import SentimentSatisfiedAltIcon from '@mui/icons-material/SentimentSatisfiedAlt';
 import EmojiPicker from 'emoji-picker-react';
 import ImageIcon from '@mui/icons-material/Image';
 import CloseIcon from '@mui/icons-material/Close';
 import Button from '../componets/Button'
+import { ToastContainer, toast } from 'react-toastify';
 
 
 const MessageChats = () => {
@@ -34,8 +35,10 @@ const MessageChats = () => {
   const chatSocket = new WebSocket(`ws://localhost:8000/ws/chat/${conversation_id}/`)
   const hiddenFileInput = useRef<HTMLInputElement | null>(null)
   const [selectedFile, setSelectedFile] = useState<File | null>(null)
-  const chatContainerRef = useRef<HTMLDivElement | null>(null);
-
+  const chatContainerRef = useRef<HTMLDivElement | null>(null)
+  const [currentPage, setCurrentPage] = useState(1)
+  const [isNextPage, setIsNextPage] = useState(false)
+  const [isLoadingBtn, setIsLoadingBtn] = useState(false)
   const [emojiMode, setEmojiMode] = useState(false)
   const [recieveMessages, setrecieveMessages] = useState<{
     text: string,
@@ -43,8 +46,17 @@ const MessageChats = () => {
     timestamp: string
   }[]>([])
 
-  console.log(historyMessages);
-  
+  const loadMoreMessages = () => {
+    setIsLoadingBtn(true)
+    try {
+      setCurrentPage(currentPage + 1)
+      setIsNextPage(true)
+    } catch (error) {
+      //BRING TOASTR
+    } finally {
+      setIsLoadingBtn(false)
+    }
+  }
 
   const handleInputText = (event: React.ChangeEvent<HTMLTextAreaElement>) => {
     setInputText(event.target.value)
@@ -67,32 +79,40 @@ const MessageChats = () => {
   };
 
   const postMessage = async () => {
+    setEmojiMode(false)
     if (selectedFile !== null || inputText.trim() !== "") {
-      if (selectedFile === null) {
-        const data = { BrowsingUserID, RecipientUserID, inputText, token }
-        const response = await dispatch(postCoverstaionMessageAsync(data))
-        console.log(response);
-        if (response.type === 'post/message/fulfilled') {
-          const text = inputText
-          const sender_id = BrowsingUserID
-          const conversation_id = response.payload.conversation_id
-          const recipient_id = RecipientUserID
-          const timestamp = new Date().toISOString();
-          chatSocket.send(JSON.stringify({ text, sender_id, conversation_id, timestamp, recipient_id }))
+      if (chatSocket.readyState === WebSocket.OPEN) {
+        if (selectedFile === null) {
+          const data = { BrowsingUserID, RecipientUserID, inputText, token }
+          const response = await dispatch(postCoverstaionMessageAsync(data))
+          console.log(response);
+          if (response.type === 'post/message/fulfilled') {
+            const text = inputText
+            const sender_id = BrowsingUserID
+            const conversation_id = response.payload.conversation_id
+            const recipient_id = RecipientUserID
+            const timestamp = new Date().toISOString();
+            chatSocket.send(JSON.stringify({ text, sender_id, conversation_id, timestamp, recipient_id }))
+          }
+        } else {
+          const data = { BrowsingUserID, RecipientUserID, inputText, token, image: selectedFile }
+          const response = await dispatch(postCoverstaionMessageAsync(data))
+          console.log(response);
+          if (response.type === 'post/message/fulfilled') {
+            const text = inputText
+            const sender_id = BrowsingUserID
+            const conversation_id = response.payload.conversation_id
+            const recipient_id = RecipientUserID
+            const timestamp = new Date().toISOString();
+            const image = response.payload.image
+            chatSocket.send(JSON.stringify({ text, sender_id, conversation_id, timestamp, recipient_id, image: image }))
+          }
         }
-      }else {
-        const data = { BrowsingUserID, RecipientUserID, inputText, token, image:selectedFile }
-        const response = await dispatch(postCoverstaionMessageAsync(data))
-        console.log(response);
-        if (response.type === 'post/message/fulfilled') {
-          const text = inputText
-          const sender_id = BrowsingUserID
-          const conversation_id = response.payload.conversation_id
-          const recipient_id = RecipientUserID
-          const timestamp = new Date().toISOString();
-          const image = response.payload.image
-          chatSocket.send(JSON.stringify({ text, sender_id, conversation_id, timestamp, recipient_id, image:image }))
-        }
+      } else {
+        // in case socket hasnt been connected
+        console.log('blabla');
+        
+        toast.error('An error has occured, please try again.')
       }
     }
     setSelectedFile(null)
@@ -118,6 +138,7 @@ const MessageChats = () => {
   useEffect(() => {
     const chatSocket = new WebSocket(`ws://localhost:8000/ws/chat/${conversation_id}/`);
 
+
     chatSocket.onmessage = function (e) {
       const data = JSON.parse(e.data);
       const text = data.text;
@@ -135,14 +156,14 @@ const MessageChats = () => {
 
     chatSocket.onclose = function (event) {
       console.log("Connection closed: code=" + event.code + ", reason=" + event.reason);
-    }
+    };
 
 
     return () => {
       // Clean up the WebSocket connection when the component unmounts.
       chatSocket.close();
     };
-  }, [conversation_id]);
+  }, [conversation_id, RecipientUserID]);
 
 
   useEffect(() => {
@@ -158,9 +179,6 @@ const MessageChats = () => {
     }
   }, [RecipientUserID, BrowsingUserID]);
 
-  useEffect(() => {
-
-  }, [selectedFile])
 
 
   useEffect(() => {
@@ -180,10 +198,17 @@ const MessageChats = () => {
     if (chatContainerRef.current) {
       chatContainerRef.current.scrollTop = chatContainerRef.current.scrollHeight;
     }
-  }, [historyMessages, recieveMessages]); // Add messages and recieveMessages as dependencies
+  }, [historyMessages, recieveMessages]) // Add messages and recieveMessages as dependencies
+
+  useEffect(() => {
+    if (isNextPage) {
+      setIsNextPage(false)
+      dispatch(fetchNextPageMessageAsync({ conversation_id, currentPage }))
+    }
+  }, [isNextPage, currentPage])
 
 
-  if (isLoading) {
+  if (isLoading ) {
     return <div className='relative left-50 sm:left-80 top-38 w-20'><Loader isTextLoading={true} /></div>
   }
 
@@ -191,6 +216,7 @@ const MessageChats = () => {
 
   return (
     <div className="message-container overflow-y-hidden">
+      <ToastContainer theme='colored' />
       <div className='flex'>
         <ConversationList conversation_id={conversation_id} />
         {location.pathname.startsWith('/messages/') && (
@@ -204,12 +230,12 @@ const MessageChats = () => {
                 <VerifiedIcon className='relative right-2' />
               )}
             </div>
-            <div className='h-114 sm:h-107 max-h-fit 3xl:h-125  overflow-y-scroll scroll-smooth scroll-into-view-bot scroll custom-scrollbar' ref={chatContainerRef}>
+            <div className='h-114 sm:h-screen xl:h-107 max-h-fit 3xl:h-125  overflow-y-scroll scroll-smooth scroll-into-view-bot scroll custom-scrollbar' ref={chatContainerRef}>
               {historyMessages.length > 0 && (
                 <>
                   {historyMessages.length > 9 && (
                     <div className='flex flex-row justify-center'>
-                      <Button text='Load more' isLoading={false} />
+                      <Button onClick={() => loadMoreMessages()} text='Load more' isLoading={isLoadingBtn} />
                     </div>
                   )}
                   {historyMessages.slice().reverse().map((data: any, index: any) => {
@@ -257,18 +283,16 @@ const MessageChats = () => {
                     placeholder="Enter a message"
                   />
                 </div>
-                <div>
+                <div className='relative bottom-9 left-65 xl:left-102 sm:left-110 3xl:left-125  transform -translate-y-1/2 w-18'>
+                  <ImageIcon onClick={triggerFileInput} className=' hover:text-gray-200 cursor-pointer' />
                   <SentimentSatisfiedAltIcon
                     onClick={() => toggleEmojis()}
-                    className='relative bottom-10 left-74 sm:left-109 transform -translate-y-1/2 hover:text-gray-200 cursor-pointer'
+                    className=' hover:text-gray-200 cursor-pointer'
                   />
                   <SendIcon
                     onClick={postMessage}
-                    className="relative bottom-10 left-65 sm:left-102 transform -translate-y-1/2 hover:text-gray-200 cursor-pointer"
+                    className=" hover:text-gray-200 cursor-pointer"
                   />
-                </div>
-                <div className='flex relative bottom-4 sm:bottom-6'>
-                  <ImageIcon onClick={triggerFileInput} className='relative left-2 cursor-pointer' />
                   <input
                     onChange={handleFileInputChange}
                     className="hidden"

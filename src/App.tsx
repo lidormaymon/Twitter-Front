@@ -45,13 +45,15 @@ function App() {
               dispatch(getUserData());
             } else {
               if (session) {
-                dispatch(checkRefresh(session)).then((res) => console.log('refreshhhhh1', res));
+                const refresh = JSON.parse(session)
+                dispatch(checkRefresh(refresh)).then((res) => console.log('refreshhhhh1', res));
               }
             }
           });
       } else {
         if (session) {
-          dispatch(checkRefresh(session)).then((res) => console.log('refreshhhhh2', res.payload));
+          const refresh = JSON.parse(session)
+          dispatch(checkRefresh(refresh)).then((res) => console.log('refreshhhhh2', res.payload));
         }
       }
       console.log('user logged status = ', isLogged);

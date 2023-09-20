@@ -73,11 +73,11 @@ export  const FollowListForm: React.FC<FollowerListFormProps> = ({ user_list_id 
             <ProfilePic image={followsCreds?.profile_image || ''} width={'45px'} className="relative right-2" />
           </Link>
           <div className="flex-col mx-2">
-            <p className="font-bold">
+            <p className="font-bold flex">
               <Link to={`/profile/${followsCreds?.id}`}>
                 <p className="hover:underline">{followsCreds?.display_name}</p>
               </Link>
-              {followsCreds?.is_verified && (<VerifiedIcon fontSize="small" className="relative bottom-1" />)}
+              {followsCreds?.is_verified && (<VerifiedIcon fontSize="small" />)}
             </p>
             <p className="text-sm font-semibold text-gray-500 relative bottom-1 right-1">@{followsCreds?.username}</p>
           </div>

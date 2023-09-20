@@ -1,6 +1,6 @@
-import { createAsyncThunk, createSlice, current } from '@reduxjs/toolkit';
+import { Dictionary, createAsyncThunk, createSlice, current } from '@reduxjs/toolkit';
 import { RootState } from '../../../app/store';
-import { fetchMessagesAPI, fetchUserConversationsAPI, findConversationIdAPI, isConverstaionExistAPI, postCoverstaionMessageAPI } from './chatsAPI';
+import { fetchMessagesAPI, fetchNextPageMessageAPI, fetchUserConversationsAPI, findConversationIdAPI, isConverstaionExistAPI, postCoverstaionMessageAPI } from './chatsAPI';
 import { build } from 'vite';
 
 
@@ -98,6 +98,14 @@ export const fetchMessagesAsync = createAsyncThunk(
     }
 )
 
+export const fetchNextPageMessageAsync = createAsyncThunk(
+    'next-page/messages',
+    async ( data:any  ) => {
+        const response = await fetchNextPageMessageAPI(data.conversation_id, data.currentPage)
+        return response.data
+    }
+)
+
 
 
 export const chatsSlice = createSlice({
@@ -149,6 +157,11 @@ export const chatsSlice = createSlice({
         })
         builder.addCase(fetchUserConversationsAsync.fulfilled, (state, action) => {
             state.ConversationAR = action.payload['Conversations']
+        })
+        builder.addCase(fetchNextPageMessageAsync.fulfilled, (state, action) => {
+            console.log(action.payload);
+            
+            state.MessageAR.push(...action.payload)
         })
     }
 })

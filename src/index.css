@@ -22,7 +22,7 @@ textarea {
 }
 
 .message-container {
-  @apply relative sm:border-l border-gray-600 sm:border-r sm:border-gray-600 flex flex-col min-h-screen h-fit w-screen sm:w-120 3xl:w-145
+  @apply relative sm:border-l border-gray-600 sm:border-r sm:border-gray-600 flex flex-col min-h-screen h-fit w-screen sm:w-109 xl:w-120 3xl:w-145
 }
 
 .links {

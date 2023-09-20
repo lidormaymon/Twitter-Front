@@ -22,7 +22,7 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({ display_name, is_verified
     }, [userPosts, profile_id])
 
     return (
-        <div className="sticky top-8 z-20 bg-black h-fit">
+        <div className="sticky top-8 sm:top-0 sm:mx-4 z-20 bg-black h-fit">
             <div className='relative top-5 flex bg-black z-20'>
                 <BackButton />
                 <div className="flex flex-col relative left-8 bottom-2">

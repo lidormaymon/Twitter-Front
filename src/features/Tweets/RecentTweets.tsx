@@ -19,6 +19,7 @@ const RecentTweets: React.FC<RecentTweetsProps> = ({ newTweet, setNewTweet }) =>
   const [isNextPage, setNextPage] = useState(false)
   const [sumbitEdited, setSumbitEdited] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
+  const [newComment, setNewComment] = useState(false)
   const [isLoadingBtn, setisLoadingBtn] = useState(false)
 
   const loadMoreTweets = () => {
@@ -37,13 +38,10 @@ const RecentTweets: React.FC<RecentTweetsProps> = ({ newTweet, setNewTweet }) =>
   useEffect(() => {
     dispatch(getTweetsPage())
     dispatch(getUsers())
-    if (newTweet) {
-      setNewTweet(false)
-    }
-    if (sumbitEdited) {
-      setSumbitEdited(false)
-    }
-  }, [newTweet, sumbitEdited, isLoading])
+    newTweet && setNewComment(false)
+    sumbitEdited && setSumbitEdited(false)
+    newComment && setNewComment(false)
+  }, [newTweet, sumbitEdited, isLoading, newComment])
 
   useEffect(() => {
     if (isNextPage) {
@@ -66,6 +64,7 @@ const RecentTweets: React.FC<RecentTweetsProps> = ({ newTweet, setNewTweet }) =>
                 <TweetForm
                   tweet_data={data}
                   setSumbitEdited={setSumbitEdited}
+                  setNewComment={setNewComment}
                 />
               </div>
             );

@@ -21,7 +21,7 @@ interface ConversationListFormsProps {
       text: string,
       timestamp: string,
       conversation_id: number,
-      image:string
+      image: string
     }
 
   }
@@ -61,18 +61,28 @@ const ConversationsListForm: React.FC<ConversationListFormsProps> = ({ data }) =
               </div>
               <p className='mx-4 font-serif'>{last_message.sender_id === BrowsingUser.id ? (
                 <p className='flex gap-x-1'><p className='text-gray-400 font-semibold'>You:</p>
-                {last_message.image !== null ? (
-                  <>
-                    <p><ImageIcon />Image</p>
-                  </>
-                ) : (
-                  <>
-                    {last_message.text}
-                  </>
-                )}
-              </p>
+                  {last_message.image !== null ? (
+                    <>
+                      <p><ImageIcon />Image</p>
+                    </>
+                  ) : (
+                    <>
+                      {last_message.text}
+                    </>
+                  )}
+                </p>
               ) : (
-                <p>{last_message.text}</p>
+                <>
+                  {last_message.image !== null ? (
+                    <>
+                      <p><ImageIcon />Image</p>
+                    </>
+                  ) : (
+                    <>
+                      {last_message.text}
+                    </>
+                  )}
+                </>
               )}</p>
             </div>
           </div>
@@ -94,7 +104,7 @@ export const ConversationList: React.FC<ConversationListProps> = ({ conversation
   const conversations = useAppSelector(selectConverstaionsAR)
   const chatSocket = new WebSocket(`ws://localhost:8000/ws/chat/${conversation_id}/`)
 
-  
+
 
   useEffect(() => {
     const chatSocket = new WebSocket(`ws://localhost:8000/ws/chat/${conversation_id}/`)
@@ -139,26 +149,26 @@ export const ConversationList: React.FC<ConversationListProps> = ({ conversation
       <div>
         <h1 className="px-5 py-5 text-2xl font-bold font-serif">Messages</h1>
         <div className='py-3'>
-        {conversations.length > 0 ? (
-          <>
-            {conversations
-              .slice() // Create a shallow copy of the array to avoid mutating the original
-              .sort((a, b) => {
-                const timestampA = parseISO(a.last_message.timestamp);
-                const timestampB = parseISO(b.last_message.timestamp);
-                return timestampB.getTime() - timestampA.getTime(); // Sort in descending order (most recent first)
-              })
-              .map((data: any, index: any) => {
-                return (
-                  <ConversationsListForm data={data} key={index} />
-                )
-              })}
-          </>
-        ) : (
-          <div>
-            <p>No active chats yet.</p>
-          </div>
-        )}
+          {conversations.length > 0 ? (
+            <>
+              {conversations
+                .slice() // Create a shallow copy of the array to avoid mutating the original
+                .sort((a, b) => {
+                  const timestampA = parseISO(a.last_message.timestamp);
+                  const timestampB = parseISO(b.last_message.timestamp);
+                  return timestampB.getTime() - timestampA.getTime(); // Sort in descending order (most recent first)
+                })
+                .map((data: any, index: any) => {
+                  return (
+                    <ConversationsListForm data={data} key={index} />
+                  )
+                })}
+            </>
+          ) : (
+            <div>
+              <p>No active chats yet.</p>
+            </div>
+          )}
         </div>
       </div>
     </div>

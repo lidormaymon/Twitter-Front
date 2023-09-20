@@ -78,7 +78,7 @@ const Profile = () => {
                 dispatch(isFollowingAsync({ from_user_id: BrowsingUser.id, to_user_id: profile_id }))
             }
         }
-    }, [BrowsingUser.is_logged, profile_id, BrowsingUser.id, followFlag, followersData.followers, followersData.following])
+    }, [BrowsingUser.is_logged, profile_id, BrowsingUser.id,isUserFollowing , followFlag, followersData.followers, followersData.following])
 
     if (profileCreds === undefined) {
         return <Error404 />
