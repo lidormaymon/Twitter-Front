@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react"
 import { useAppDispatch, useAppSelector } from "../../app/hooks"
 import { fetchProfileLikedTweetsAsync, nextPageProfileLikedTweetsAsync, selectTweets } from "../Tweets/slicer/tweetSlice"
-import { getUsers } from "../auth/authSlice"
+import { getUsers } from "../auth/Slicer/authSlice"
 import TweetForm from "../Tweets/componets/TweetForm"
 import Button from "../componets/Button"
 

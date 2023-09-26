@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import SearchIcon from '@mui/icons-material/Search';
 import { useAppDispatch, useAppSelector } from '../../../app/hooks';
-import { getUsers, searchUsers, selectUsers } from '../../auth/authSlice';
+import { getUsers, searchUsers, selectUsers } from '../../auth/Slicer/authSlice';
 import Profile from '../../profile/Profile';
 import ProfilePic from '../../profile/componets/ProfilePic';
 import { Link } from 'react-router-dom';
@@ -27,10 +27,10 @@ const SearchMobile = () => {
     }, [queryUsers])
     return (
         <div className='my-container'>
-            <div className='relative top-5 left-2 w-10'>
+            <div className='relative top-5 left-2 sm:left-0 w-10 sm:w-full'>
                 <input
                     id='search-input'
-                    className='pl-12 w-82 h-10 rounded-full bg-gray-800 outline-none'
+                    className='pl-12 w-82 sm:w-full h-10  rounded-full bg-gray-800 outline-none'
                     placeholder='Search'
                     value={isClicked ? '' : searchQuery}
                     onChange={handleSearchInput}
@@ -50,7 +50,7 @@ const SearchMobile = () => {
                                         return (
                                             <div key={user.id} className='flex items-center my-5 '>
                                                 <Link
-                                                    to={`/profile/${user.id}`}
+                                                    to={`/profile/${user.username}`}
                                                     className='hover:bg-gray-600 w-full rounded-3xl'
                                                     onClick={() => setIsClicked(true)}>
                                                     <div className='flex flex-row mx-2 bg'>

@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react"
 import { useAppDispatch, useAppSelector } from "../../../app/hooks"
 import ProfilePic from "../../profile/componets/ProfilePic"
-import { getUsers, selectUserData, selectUsers } from "../../auth/authSlice"
+import { getUsers, selectUserData, selectUsers } from "../../auth/Slicer/authSlice"
 import Button from "../../componets/Button"
 import { postCommentAsync } from "../slicer/tweetSlice"
 import SentimentSatisfiedAltIcon from '@mui/icons-material/SentimentSatisfiedAlt';

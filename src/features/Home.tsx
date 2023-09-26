@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import FollowingTweets from "./Tweets/FollowingTweets";
 import RecentTweets from "./Tweets/RecentTweets";
-import { getUsers, selectLoggedStatus, selectUserData, selectUsers } from "./auth/authSlice";
+import { getUsers, selectLoggedStatus, selectUserData, selectUsers } from "./auth/Slicer/authSlice";
 import { useAppDispatch, useAppSelector } from "../app/hooks";
 import { postTweetData } from "./Tweets/slicer/tweetSlice";
 import Button from "./componets/Button";
@@ -20,7 +20,7 @@ interface HeaderProps {
 const Header = ({ activeTab, handleTabClick }: HeaderProps) => {
   const isLogged = useAppSelector(selectLoggedStatus)
   return (
-    <div className="sticky top-8 sm:top-0 h-fit self-start z-50 bg-black border-r-1 border-gray-600 container  w-full sm:w-105 3xl:w-108">
+    <div className={`sticky top-9 sm:top-0 h-fit self-start z-50 bg-black border-r-1 border-gray-600 container  w-full sm:w-105 3xl:w-108`}>
       <div className="sticky top-0 ">
         <div className="border-b border-gray-600">
           <h1 className="font-bold font- text-xl mx-2 px-2 py-4">Home</h1>
@@ -29,12 +29,12 @@ const Header = ({ activeTab, handleTabClick }: HeaderProps) => {
               className={`${isLogged === true ? 'w-1/2 p-4 py-5 cursor-pointer hover:bg-gray-600' : 'w-full p-4 py-5 cursor-pointer hover:bg-gray-600'} `}
               onClick={() => handleTabClick("forYou")}
             >
-              <div>
+              <div className="flex flex-col">
                 <p className={`text-center ${activeTab === 'forYou' ? "text-white relative" : "text-gray-400"}`}>For you</p>
-                <span>
-                  <div className={`${activeTab === 'forYou' ? "w-14 h-2 rounded-full bg-blue-500  relative top-5 left-12 sm:top-5 sm:left-29 3xl:left-32" : ""}
-                  ${!isLogged && 'w-14 h-2 rounded-full bg-blue-500  relative top-5 left-38 sm:top-5 sm:left-67 3xl:left-69'}`}></div>
-                </span>
+                <div className="flex flex-row w-full justify-center ">
+                  <div className={`${activeTab === 'forYou' && "w-14 h-2 rounded-full bg-blue-500 center relative top-5  sm:top-5 "}
+                  ${!isLogged && 'w-14 h-2 rounded-full bg-blue-500  relative top-5 sm:top-5'}`}></div> {/* this div */}
+                </div>
               </div>
             </div>
             {isLogged && (
@@ -44,9 +44,9 @@ const Header = ({ activeTab, handleTabClick }: HeaderProps) => {
               >
                 <div>
                   <p className={`text-center ${activeTab !== 'forYou' ? "text-white" : "text-gray-400"}`}>Following</p>
-                  <span>
-                    <div className={`${activeTab !== 'forYou' ? "w-14 h-2 rounded-full bg-blue-500  relative top-5 left-12 sm:top-5 sm:left-28 3xl:left-32" : ""}`}></div>
-                  </span>
+                  <div className="flex flex-row self w-full justify-center">
+                    <div className={`${activeTab !== 'forYou' && "w-14 h-2 rounded-full bg-blue-500  relative top-5 sm:top-5"}`}></div>
+                  </div>
                 </div>
               </div>
             )}
@@ -97,7 +97,7 @@ const Home = () => {
 
   const postTweet = (text: string) => {
     const data = { user_id: BrowsingUser.id, text: text }
-    if (selectedFile !== null) {
+    if (selectedFile !== null) { //checking if image was selected to know if to attach it
       const data = { user_id: BrowsingUser.id, text: text, image: selectedFile }
       dispatch(postTweetData(data))
     } else dispatch(postTweetData(data))
@@ -125,7 +125,7 @@ const Home = () => {
   }, [])
 
   useEffect(() => {
-    
+
   }, [selectedFile])
 
 
@@ -144,18 +144,23 @@ const Home = () => {
                   <img src={URL.createObjectURL(selectedFile)} alt="Selected" className="absolute top-18 left-28 h-14 w-14" />
                 </>
               )}
-              <textarea
-                className="bg-black border-b-1 border-gray-600 h-14 w-75 md:w-98 3xl:w-102 pl-5 relative left-20 top-2  focus:outline-none"
-                placeholder="What's happening today?!"
-                onChange={handleTextInput}
-                value={tweetText}
-              />
+              <div className="flex flex-row">
+                <textarea
+                  className="bg-black border-b-1 border-gray-600 h-14 w-75 sm:w-[30rem] md:w-98 3xl:w-102 pl-5 relative left-20 top-2  focus:outline-none"
+                  placeholder="What's happening today?!"
+                  onChange={handleTextInput}
+                  value={tweetText}
+                />
+                <div className="w-fit z-40">
+                  <SentimentSatisfiedAltIcon
+                    onClick={() => toggleEmojis()}
+                    className='flex flex-row flex-end hover:text-gray-200 cursor-pointer'
+                  />
+                </div>
+              </div>
             </div>
 
-            <SentimentSatisfiedAltIcon
-              onClick={() => toggleEmojis()}
-              className='absolute top-1/2 right-10 transform -translate-y-1/2 hover:text-gray-200 cursor-pointer'
-            />
+
 
             <div className="flex">
               <Button

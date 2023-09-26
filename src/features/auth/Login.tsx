@@ -2,9 +2,8 @@ import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import * as icons from 'react-icons/ai';
 import { useAppDispatch, useAppSelector } from '../../app/hooks';
-import { loginAsync, selectLoggedStatus } from './authSlice';
+import { loginAsync, selectLoggedStatus } from './Slicer/authSlice';
 import Button from '../componets/Button'
-import { GoogleLogin } from '@react-oauth/google';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
@@ -54,19 +53,13 @@ const Login = () => {
 
                 }
                 toast.error('Wrong username or password!'), setErrorFlag(true), setErrorMsg('Wrong username or password.')
-            }else toast.error('Must fill all the fields!'), setErrorFlag(true), setErrorMsg('Must fill all the fields.')
+            } else toast.error('Must fill all the fields!'), setErrorFlag(true), setErrorMsg('Must fill all the fields.')
         } catch (error) {
             console.log(error);
         } finally {
             setIsLoading(false);
         }
     };
-
-
-
-
-
-
 
 
     useEffect(() => {
@@ -103,21 +96,6 @@ const Login = () => {
                     <p className='text-xs font-semibold relative left-2'>Remember me?</p>
                 </div>
                 <a href='/register' className="text-xs text-blue-400 underline font-medium relative right-4">Doesn't have an account?</a><br />
-                <div className='relative bottom-3'>
-                    <div>
-                        <div className='border-b-1 border-gray-600 w-20 relative top-1 right-10' />
-                        <div className='border-b-1 border-gray-600 w-20 relative top-1 left-40 ' />
-                        <p className='text-xs text-center text-gray-400 font-semibold relative bottom-1'>Or continue with</p>
-                    </div>
-                    <GoogleLogin
-                        onSuccess={credentialResponse => {
-                            console.log(credentialResponse);
-                        }}
-                        onError={() => {
-                            console.log('Login Failed');
-                        }}
-                    />
-                </div>
                 <Button text='Login' isLoading={isLoading} className="w-36 hover:bg-blue-400" onClick={handleLogin} />
             </div>
         </div>

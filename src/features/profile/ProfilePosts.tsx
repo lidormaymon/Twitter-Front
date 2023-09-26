@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react'
 import TweetForm from '../Tweets/componets/TweetForm'
 import { useAppDispatch, useAppSelector } from '../../app/hooks'
 import { fetchProfileTweetsAsync, nextPageProfileTweetsAsync, selectTweets  } from '../Tweets/slicer/tweetSlice'
-import { getUsers } from '../auth/authSlice'
+import { getUsers } from '../auth/Slicer/authSlice'
 import Button from '../componets/Button'
 
 interface profilePostProps {

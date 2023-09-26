@@ -1,4 +1,4 @@
-import { ButtonHTMLAttributes} from 'react';
+import { ButtonHTMLAttributes, useEffect} from 'react';
 import Loader from './Loader';
 
 interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
@@ -9,6 +9,11 @@ interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
 }
 
 const Button: React.FC<ButtonProps> = ({ text, className,isLoading, loaderClass, ...props}) => {
+  useEffect(() => {
+    console.log(isLoading);
+    
+  }, [isLoading])
+  
   return (
     <div>
         <button {...props} className={`bg-blue-600 h-11 w-24 rounded-full font-semibold hover:bg-blue-400 ${className}`}>

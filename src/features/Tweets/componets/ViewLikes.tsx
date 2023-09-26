@@ -33,7 +33,7 @@ export const ViewLikes: React.FC<ViewLikesProps> = ({ tweet_id, setlikesViewFlag
 
 
     return (
-        <div className="fixed inset-0 bg-zinc-900/20 bottom-40 flex flex-col items-center justify-center z-50">
+        <div className="fixed inset-0 bg-zinc-700/20 h-screen bottom-40 flex flex-col items-center justify-center z-50">
             <div className="bg-black p-4 w-82 sm:w-97 min-h-[200px] h-fit">
                 <div className='flex justify-between items-center mb-4'>
                     <h2 className="text-xl font-semibold">Likes</h2>

@@ -70,7 +70,6 @@ export const isFollowingAsync = createAsyncThunk(
     'isFollowing/follows',
     async (data: any) => {
         console.log(data);
-
         const response = await isFollowingAPI(data.from_user_id, data.to_user_id)
         return response.data
     }
@@ -137,6 +136,9 @@ export const followersSlice = createSlice({
                 const existingStatusIndex = state.followStatusList.findIndex(
                     status => status.id === follow_id
                 )
+                console.log(state.followStatusList[existingStatusIndex]);
+                
+
                 
 
             });

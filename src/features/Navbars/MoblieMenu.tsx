@@ -1,25 +1,31 @@
-import HomeIcon from '@mui/icons-material/Home';
 import LoginIcon from '@mui/icons-material/Login';
-import { useAppSelector } from '../../app/hooks';
-import { selectLoggedStatus } from '../auth/authSlice'
+import { selectLoggedStatus } from '../auth/Slicer/authSlice'
 import logo from './logo.png'
-import { Link } from "react-router-dom";
+import { Link } from "react-router-dom"
+import LogoutIcon from '@mui/icons-material/Logout';;
+import { useAppDispatch, useAppSelector } from '../../app/hooks';
+import { logOut } from '../auth/Slicer/authSlice';
 
 
 const MobileMenu = () => {
+    const dispatch = useAppDispatch()
     const isLogged = useAppSelector(selectLoggedStatus)
     return (
         <div className="sticky top-0 z-20 bg-black">
             <div className="flex flex-row  sm:hidden shrink border-none  sticky top-0">
                 <div className="flex flex-row w-full ">
-                    <img src={logo} width={'30px'} className="relative left-2" />
+                    <Link to={'/'}>
+                        <img src={logo} width={'30px'} className="relative left-2" />
+                    </Link>
+
                     <div className="ml-auto ">
-                        <Link to={'/'}>
-                            <HomeIcon className="relative top-1 right-2" fontSize="large" />
-                        </Link>
-                        {!isLogged && (
+                        {!isLogged ? (
                             <Link to={'/login'}>
                                 <LoginIcon className='relative top-1 right-1' fontSize='large' />
+                            </Link>
+                        ) : (
+                            <Link to={'/'} onClick={() => dispatch(logOut())} className='relative top-1 right-1'>
+                                <LogoutIcon fontSize='large' />
                             </Link>
                         )}
                     </div>

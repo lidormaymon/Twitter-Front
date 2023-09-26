@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react'
 import BackButton from '../componets/BackButton'
 import Button from '../componets/Button'
 import { useAppDispatch, useAppSelector } from '../../app/hooks'
-import { changePwdAsync, selectUserData } from './authSlice'
+import { changePwdAsync, selectUserData } from './Slicer/authSlice'
 import { useNavigate } from 'react-router-dom'
 import * as icons from "react-icons/ai";
 import { ToastContainer, toast } from 'react-toastify';

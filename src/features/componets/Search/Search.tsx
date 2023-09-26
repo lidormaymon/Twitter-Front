@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import SearchIcon from '@mui/icons-material/Search';
 import { useAppDispatch, useAppSelector } from '../../../app/hooks';
-import { getUsers, searchUsers, selectUsers } from '../../auth/authSlice';
+import { getUsers, searchUsers, selectUsers } from '../../auth/Slicer/authSlice';
 import Profile from '../../profile/Profile';
 import ProfilePic from '../../profile/componets/ProfilePic';
 import { Link } from 'react-router-dom';
@@ -53,7 +53,7 @@ const Search = () => {
                 return (
                   <div key={user.id} className='flex items-center my-5'>
                     <Link
-                      to={`profile/${user.id}`}
+                      to={`profile/${user.username}`}
                       className='hover:bg-gray-600 w-full rounded-3xl'
                       onClick={() => navigateProfile()}>
                       <div className='flex flex-row mx-2 bg'>

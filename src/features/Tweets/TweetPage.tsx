@@ -1,6 +1,6 @@
 import { useAppDispatch, useAppSelector } from "../../app/hooks"
 import ProfilePic from "../profile/componets/ProfilePic"
-import { getUsers, selectUserData, selectUsers } from "../auth/authSlice"
+import { getUsers, selectUserData, selectUsers } from "../auth/Slicer/authSlice"
 import FavoriteBorderIcon from '@mui/icons-material/FavoriteBorder'
 import ChatBubbleOutlineIcon from '@mui/icons-material/ChatBubbleOutline'
 import FavoriteIcon from '@mui/icons-material/Favorite'
@@ -148,11 +148,11 @@ const TweetPage = () => {
           <p className="text-xl font-bold">Post</p>
         </div>
         <div className="flex relative bottom-3 sm:bottom-0 sm:right-4">
-          <Link to={`/profile/${posterCreds?.id}`}>
+          <Link to={`/profile/${posterCreds?.username}`}>
             <ProfilePic image={posterCreds?.profile_image || ''} className="sm:w-14" alt="profile image" />
           </Link>
           <div className="mx-5 flex">
-            <Link to={`/profile/${posterCreds?.id}`}>
+            <Link to={`/profile/${posterCreds?.username}`}>
               <p className="text-lg font-bold hover:underline">{posterCreds?.display_name}</p>
             </Link>
             {posterCreds?.is_verified && (
@@ -231,7 +231,7 @@ const TweetPage = () => {
         </div>
         <div className="relative right-10 w-97 sm:w-105 border-b border-gray-600 h-4 sm:h-6" />
         {BrowsingUser.is_logged && (
-          <PostComment setnewComment={setnewComment} comments={tweetData.comments} tweet_id={tweet_id} className="border-t-0 relative right-4 sm:right-10 w-96 sm:w-105" />
+          <PostComment setNewComment={setnewComment} comments={tweetData.comments} tweet_id={tweet_id} className="border-t-0 relative right-4 sm:right-10 w-96 sm:w-105" />
         )}
       </div>
       {tweet_comments.map((data: any, index: any) => (

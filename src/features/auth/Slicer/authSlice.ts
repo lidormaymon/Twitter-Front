@@ -1,6 +1,7 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
-import { RootState } from '../../app/store';
-import { checkCredsValid, chkRefreshToken, register, getUsersData, fetchUserPostsAPI, searchUsersAPI, loginAPI, editUserAPI, changePwdAPI } from './authAPI';
+import { RootState } from '../../../app/store';
+import { checkCredsValid, chkRefreshToken, register, getUsersData, fetchUserPostsAPI, searchUsersAPI, loginAPI, editUserAPI, changePwdAPI, verifiedAPI } from './authAPI';
+import { build } from 'vite';
 
 
 export interface userDataState {
@@ -117,6 +118,13 @@ export const changePwdAsync = createAsyncThunk(
     }
 )
 
+export const verifiedAsync = createAsyncThunk(
+    'verified/request',
+    async (data:any) => {
+        const response = await verifiedAPI(data.profile_id, data.is_verified)
+        return response.data
+    }
+)
 
 export const authSlice = createSlice({
     name: 'auth',
@@ -168,6 +176,11 @@ export const authSlice = createSlice({
         })
         builder.addCase(getUsers.fulfilled, (state, action) => {
             state.UsersAR = action.payload
+        })
+        builder.addCase(verifiedAsync.fulfilled, (state, action) => {
+            console.log(action);
+            const userIndex = state.UsersAR.findIndex((user) => user.id, action.payload.user_id)
+            state.UsersAR[userIndex].is_verified = action.payload.is_verified
         })
     }
 })

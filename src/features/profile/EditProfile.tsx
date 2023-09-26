@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react'
 import { Link, useNavigate, useParams } from 'react-router-dom'
 import { useAppDispatch, useAppSelector } from '../../app/hooks'
-import { editUserAsync, getUsers, selectUserData, selectUsers } from '../auth/authSlice'
+import { editUserAsync, getUsers, selectUserData, selectUsers } from '../auth/Slicer/authSlice'
 import ProfileHeader from './componets/ProfileHeader'
 import Button from '../componets/Button'
 import ProfilePic from './componets/ProfilePic'

@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react'
 import { useAppDispatch, useAppSelector } from '../../app/hooks'
-import { getUsers, selectUserData, selectUsers } from '../auth/authSlice'
+import { getUsers, selectUserData, selectUsers } from '../auth/Slicer/authSlice'
 import { fetchUserConversationsAsync, selectConverstaionsAR, updateConversation } from './slicer/chatsSlicer'
 import ProfilePic from '../profile/componets/ProfilePic'
 import { Link } from 'react-router-dom'
@@ -50,7 +50,7 @@ const ConversationsListForm: React.FC<ConversationListFormsProps> = ({ data }) =
 
   return (
     <div>
-      <Link to={`/messages/${RecipientUserID}`}>
+      <Link to={`/messages/${RecipientUserCreds?.username}`}>
         <div className='flex relative top-5 h-20 sm:w-65'>
           <div className='flex mx-3'>
             <ProfilePic image={RecipientUserCreds?.profile_image || ''} width={'50px'} />
@@ -102,7 +102,6 @@ export const ConversationList: React.FC<ConversationListProps> = ({ conversation
   const BrowsingUserID = BrowsingUser.id
   const tokenString = localStorage.getItem('token')
   const conversations = useAppSelector(selectConverstaionsAR)
-  const chatSocket = new WebSocket(`ws://localhost:8000/ws/chat/${conversation_id}/`)
 
 
 

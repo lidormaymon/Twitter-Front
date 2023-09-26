@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom"
 import ProfileHeader from "./componets/ProfileHeader";
 import { useAppDispatch, useAppSelector } from "../../app/hooks";
-import { getUsers, selectUsers } from "../auth/authSlice";
+import { getUsers, selectUsers } from "../auth/Slicer/authSlice";
 import {
   fetchFollowersAsync, fetchFollowersListAsync, selectFollowersListAR,
   selectFollowingListAR
@@ -15,20 +15,20 @@ import { FollowListForm } from "./componets/FollowerListForm";
 
 const FollowersList = () => {
   const dispatch = useAppDispatch()
-  const { id: id, status: status } = useParams<{ id: string, status: string }>()
+  const { username: username, status: status } = useParams<{ username: string, status: string }>()
   const list_status = status
-  const profile_id = Number(id)
   const [activeTab, setActiveTab] = useState('')
   const [pageNotFound, setPageNotFound] = useState(false)
   const users = useAppSelector(selectUsers)
   const profileCreds = users.find(
-    (user: any) => user.id === profile_id
+    (user: any) => user.username === username
   )
+  const profile_id = profileCreds && profileCreds.id
   const FollowersList = useAppSelector(selectFollowersListAR)
   const FollowingList = useAppSelector(selectFollowingListAR)
 
   useEffect(() => {
-    dispatch(fetchFollowersListAsync(profile_id))
+    dispatch(fetchFollowersListAsync(profile_id || 0))
 
 
   }, [profile_id])
@@ -45,7 +45,7 @@ const FollowersList = () => {
     } else {
       setPageNotFound(true)
     }
-  }, [profile_id, status])
+  }, [profile_id, status, username])
 
   return (
     <div className='my-container'>
@@ -54,7 +54,7 @@ const FollowersList = () => {
           <ProfileHeader
             display_name={profileCreds?.display_name || ''}
             is_verified={profileCreds?.is_verified || false}
-            profile_id={profile_id}
+            profile_id={profile_id || 0}
           />
         </div>
         <div className="flex flex-row relative top-11 text-gray-400 cursor-pointer border-b border-gray-600">

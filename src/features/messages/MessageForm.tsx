@@ -1,6 +1,6 @@
 import React from 'react'
 import { useAppSelector } from '../../app/hooks'
-import { selectUserData } from '../auth/authSlice'
+import { selectUserData } from '../auth/Slicer/authSlice'
 import { formatDistanceToNow, parseISO } from 'date-fns';
 import TweetImage from '../componets/DisplayImage';
 

@@ -1,7 +1,7 @@
 import { Link, useNavigate, useParams } from 'react-router-dom'
 import { ConversationList } from './ConversationList'
 import { useAppDispatch, useAppSelector } from '../../app/hooks'
-import { getUsers, selectUserData, selectUsers } from '../auth/authSlice'
+import { getUsers, selectUserData, selectUsers } from '../auth/Slicer/authSlice'
 import { useEffect, useRef, useState } from 'react'
 import Loader from '../componets/Loader'
 import ProfilePic from '../profile/componets/ProfilePic'
@@ -18,15 +18,15 @@ import { ToastContainer, toast } from 'react-toastify';
 
 
 const MessageChats = () => {
-  const { id } = useParams<{ id: string }>()
-  const RecipientUserID = Number(id)
+  const { username } = useParams<{ username: string }>()
   const dispatch = useAppDispatch()
   const BrowsingUser = useAppSelector(selectUserData)
   const BrowsingUserID = BrowsingUser.id
   const navigate = useNavigate()
   const [isLoading, setIsLoading] = useState(true)
   const users = useAppSelector(selectUsers)
-  const recipientCreds = users.find((user) => user.id === RecipientUserID)
+  const recipientCreds = users.find((user) => user.username === username)
+  const RecipientUserID = recipientCreds?.id  
   const [inputText, setInputText] = useState('')
   const historyMessages = useAppSelector(selectMessages)
   const tokenString = localStorage.getItem('token')
@@ -163,7 +163,7 @@ const MessageChats = () => {
       // Clean up the WebSocket connection when the component unmounts.
       chatSocket.close();
     };
-  }, [conversation_id, RecipientUserID]);
+  }, [conversation_id, username]);
 
 
   useEffect(() => {
@@ -177,7 +177,7 @@ const MessageChats = () => {
         }
       );
     }
-  }, [RecipientUserID, BrowsingUserID]);
+  }, [username, BrowsingUserID]);
 
 
 
@@ -209,7 +209,7 @@ const MessageChats = () => {
 
 
   if (isLoading ) {
-    return <div className='relative left-50 sm:left-80 top-38 w-20'><Loader isTextLoading={true} /></div>
+    return <div className='relative left-50 sm:left-80 top-38 w-20 h-screen'><Loader isTextLoading={true} /></div>
   }
 
 

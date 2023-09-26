@@ -1,11 +1,11 @@
 import { useAppDispatch, useAppSelector } from "../../app/hooks";
-import { selectLoggedStatus, logOut, selectUserData } from "../auth/authSlice";
+import { selectLoggedStatus, logOut, selectUserData } from "../auth/Slicer/authSlice";
 import PersonIcon from '@mui/icons-material/Person';
 import HomeIcon from '@mui/icons-material/Home';
 import LoginIcon from '@mui/icons-material/Login';
 import MailOutlineIcon from '@mui/icons-material/MailOutline';
 import LogoutIcon from '@mui/icons-material/Logout';
-import NotificationsIcon from '@mui/icons-material/Notifications';
+import VerifiedIcon from '@mui/icons-material/Verified';
 import logo from './logo.png'
 import { Link } from "react-router-dom"
 import SearchIcon from '@mui/icons-material/Search';
@@ -51,7 +51,7 @@ const SideNav = () => {
                     ) : (
                         <>
                             <div className="items-center links">
-                                <Link to={`/profile/${BrowsingUser.id}`} className="flex">
+                                <Link to={`/profile/${BrowsingUser.username}`} className="flex">
                                     <PersonIcon className="relative  right-2 top-1" />
                                     <p className="hidden xl:block">Profile</p>
                                 </Link>
@@ -63,14 +63,8 @@ const SideNav = () => {
                             </div>
                             <div className="flex items-center links">
                                 <Link to={'/messages'} className="flex">
-                                    <MailOutlineIcon className="relative  right-2 top-1"  />
+                                    <MailOutlineIcon className="relative  right-2 top-1" />
                                     <p className="hidden xl:block">Messages</p>
-                                </Link>
-                            </div>
-                            <div className="flex items-center links ">
-                                <Link to={'#'} className="flex">
-                                    <NotificationsIcon className="relative right-2 top-1" />
-                                    <p className="hidden xl:block">Notifications</p>
                                 </Link>
                             </div>
                             <div className="flex items-center links">

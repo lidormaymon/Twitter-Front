@@ -74,3 +74,11 @@ export const changePwdAPI =  async (oldPWD:string, newPWD:string, user_id:number
     }else return 'Wrong password'
     
 }
+
+export const verifiedAPI = (user_id:number, isVerfied:boolean) => {
+    if (isVerfied) {
+        return axios.put(API_SERVER + `user/${user_id}/`, {is_verified:false})
+    }else {
+        return axios.put(API_SERVER + `user/${user_id}/`, {is_verified:true})
+    }
+}

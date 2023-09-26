@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 
 import { useAppDispatch, useAppSelector } from "../../../app/hooks";
-import { getUsers, selectUserData, selectUsers } from "../../auth/authSlice";
+import { getUsers, selectUserData, selectUsers } from "../../auth/Slicer/authSlice";
 import {
   deleteFollowAsync, fetchFollowersAsync, postFolloweAsync, 
   isFollowingAsync, selectFollowers,selectFollowStatusList
@@ -69,12 +69,12 @@ export  const FollowListForm: React.FC<FollowerListFormProps> = ({ user_list_id 
     return (
       <div className="container flex flex-row p-6 border-b border-gray-600 h-auto ">
         <div className="mx-2 flex relative bottom-5 w-full">
-          <Link to={`/profile/${followsCreds?.id}`}>
+          <Link to={`/profile/${followsCreds?.username}`}>
             <ProfilePic image={followsCreds?.profile_image || ''} width={'45px'} className="relative right-2" />
           </Link>
           <div className="flex-col mx-2">
             <p className="font-bold flex">
-              <Link to={`/profile/${followsCreds?.id}`}>
+              <Link to={`/profile/${followsCreds?.username}`}>
                 <p className="hover:underline">{followsCreds?.display_name}</p>
               </Link>
               {followsCreds?.is_verified && (<VerifiedIcon fontSize="small" />)}

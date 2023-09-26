@@ -5,7 +5,7 @@ import FavoriteIcon from '@mui/icons-material/Favorite';
 import VerifiedIcon from '@mui/icons-material/Verified';
 import { formatDistanceToNow, parseISO } from 'date-fns';
 import { useAppDispatch, useAppSelector } from "../../../app/hooks";
-import { selectUserData, selectUsers } from "../../auth/authSlice";
+import { selectUserData, selectUsers } from "../../auth/Slicer/authSlice";
 import { likeTweet, query_likes, undoLike, selectLikes, getLikes, deleteTweetAsync, editTweetAsync, fetchTweetLikesAsync, selectViewLikes } from "../slicer/tweetSlice";
 import { Link, useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
@@ -27,10 +27,10 @@ interface TweetFormProps {
     user_id: number,
     liked_by_me: boolean,
     edit: boolean,
-    image:string
+    image: string
   },
-  setSumbitEdited: React.Dispatch<React.SetStateAction<boolean>>
-  setNewComment:React.Dispatch<React.SetStateAction<boolean>>
+  setSumbitEdited?: React.Dispatch<React.SetStateAction<boolean>> //putting this props, as not required, as there are componets where, don't need sumbit edit flag, such
+  setNewComment: React.Dispatch<React.SetStateAction<boolean>>
 }
 
 
@@ -140,11 +140,11 @@ const TweetForm: React.FC<TweetFormProps> = ({ tweet_data, setSumbitEdited, setN
   const toggleLikesView = (event: React.MouseEvent) => {
     event.preventDefault()
     setlikesViewFlag(true)
-    document.body.classList.add('overflow-hidden' )
+    document.body.classList.add('overflow-hidden')
   }
 
 
-  
+
 
   useEffect(() => {
     if (newLike) { //adding this if statement, so if user tries to like and unlike again, it'd retrive the new data of likes
@@ -170,18 +170,18 @@ const TweetForm: React.FC<TweetFormProps> = ({ tweet_data, setSumbitEdited, setN
         <Link to={`/tweet-post/${tweet_id}`}>
           <div className="container  w-95  sm:w-97% p-6 sm:p-8 max-h-max ">
             <div className="flex flex-row flex-shrink">
-              <Link to={`/profile/${tweeterCreds?.id}`}>
+              <Link to={`/profile/${tweeterCreds?.username}`}>
                 <ProfilePic image={tweeterCreds?.profile_image || ''} className="relative bottom-4 right-3 cursor-pointer" />
               </Link>
               <div className="flex flex-row justify-between relative bottom-4 space-x-1 bg-whit  w-82 sm:w-100">
                 <div className="flex flex-row space-x-1">
-                  <Link to={`/profile/${tweeterCreds?.id}`}>
+                  <Link to={`/profile/${tweeterCreds?.username}`}>
                     <p className="font-bold hover:underline cursor-pointer text-sm sm:text-base">{tweeterCreds?.display_name}</p>
                   </Link>
                   {tweeterCreds?.is_verified && (
                     <VerifiedIcon />
                   )}
-                  <Link to={`/profile/${tweeterCreds?.id}`}>
+                  <Link to={`/profile/${tweeterCreds?.username}`}>
                     <p className="text-gray-500 font-semibold font-sans text-sm sm:text-base cursor-pointer">@{tweeterCreds?.username}</p>
                   </Link>
                   <p className="relative left-1 text-gray-500 font-semibold font-sans text-sm sm:text-base">
@@ -194,25 +194,27 @@ const TweetForm: React.FC<TweetFormProps> = ({ tweet_data, setSumbitEdited, setN
                     </>
                   )}
                 </div>
-                <div className="flex items-center">
-                  {(BrowsingUserID === tweeterCreds?.id || BrowsingUser.is_staff) && (
-                    <>
-                      {toggleOptionsFlag ? (
-                        <div className="flex">
-                          <div className="w-16 rounded-md text-gray-400 font-semibold bg-gray-800 relative -left-1 sm:-left-1 text-center">
-                            {BrowsingUser.id === tweeterCreds?.id && (
-                              <p onClick={(event) => toggleEdit(event)} className="border-b border-gray-600 hover:bg-gray-600">Edit</p>
-                            )}
-                            <p onClick={(event) => deleteTweet(event, tweet_id)} className="hover:bg-gray-600">Delete</p>
+                <div className="flex flex-row w-full ">
+                  <div className="flex w-full flex-row justify-end">
+                    {(BrowsingUserID === tweeterCreds?.id || BrowsingUser.is_staff) && (
+                      <>
+                        {toggleOptionsFlag ? (
+                          <div className="flex">
+                            <div className="w-16 rounded-md text-gray-400 font-semibold bg-gray-800 relative -left-1 sm:-left-1 text-center">
+                              {BrowsingUser.id === tweeterCreds?.id && (
+                                <p onClick={(event) => toggleEdit(event)} className="border-b border-gray-600 hover:bg-gray-600">Edit</p>
+                              )}
+                              <p onClick={(event) => deleteTweet(event, tweet_id)} className="hover:bg-gray-600">Delete</p>
+                            </div>
                           </div>
-                        </div>
-                      ) : null}
-                      <MoreHorizIcon
-                        className="flex flex-row text-gray-600 cursor-pointer relative bottom-4"
-                        onClick={(event) => toggleOption(event)}
-                      />
-                    </>
-                  )}
+                        ) : null}
+                        <MoreHorizIcon
+                          className="flex flex-row text-gray-600 cursor-pointer relative bottom-1"
+                          onClick={(event) => toggleOption(event)}
+                        />
+                      </>
+                    )}
+                  </div>
                 </div>
               </div>
             </div>

@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useAppDispatch, useAppSelector } from "../../app/hooks";
 import { getTweetsPage, tweetNextPage, selectTweets } from "./slicer/tweetSlice";
-import { getUsers, selectUsers } from "../auth/authSlice";
+import { getUsers, selectUsers } from "../auth/Slicer/authSlice";
 
 import TweetForm from "./componets/TweetForm";
 import Button from "../componets/Button";
@@ -38,7 +38,7 @@ const RecentTweets: React.FC<RecentTweetsProps> = ({ newTweet, setNewTweet }) =>
   useEffect(() => {
     dispatch(getTweetsPage())
     dispatch(getUsers())
-    newTweet && setNewComment(false)
+    newTweet && setNewTweet(false)
     sumbitEdited && setSumbitEdited(false)
     newComment && setNewComment(false)
   }, [newTweet, sumbitEdited, isLoading, newComment])
@@ -74,7 +74,7 @@ const RecentTweets: React.FC<RecentTweetsProps> = ({ newTweet, setNewTweet }) =>
               <Button
                 isLoading={isLoadingBtn}
                 text="Load more"
-                className="relative left-38  sm:left-67 top-1 font-semibold"
+                className="relative left-38  sm:left-67 top-5 font-semibold"
                 onClick={() => loadMoreTweets()}
               />
             </div>

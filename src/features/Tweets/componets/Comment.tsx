@@ -1,6 +1,6 @@
 import { useAppDispatch, useAppSelector } from "../../../app/hooks"
 import ProfilePic from "../../profile/componets/ProfilePic"
-import { selectUserData, selectUsers } from "../../auth/authSlice"
+import { selectUserData, selectUsers } from "../../auth/Slicer/authSlice"
 import MoreHorizIcon from '@mui/icons-material/MoreHoriz'
 import Loader from "../../componets/Loader"
 import FavoriteBorderIcon from '@mui/icons-material/FavoriteBorder'
@@ -99,18 +99,18 @@ const Comment: React.FC<CommentProps> = ({ tweet_comments }) => {
             <div className="relative top-10 right-5 sm:left-1 sm:top-12 mx-4 sm:mx-0">
                 <div className="flex">
                     <div>
-                        <Link to={`/profile/${commnetPosterCreds?.id}`}>
+                        <Link to={`/profile/${commnetPosterCreds?.username}`}>
                             <ProfilePic image={commnetPosterCreds?.profile_image || ''} />
                         </Link>
                     </div>
                     <div className="flex  mx-4 sm:mx-6">
-                        <Link to={`/profile/${commnetPosterCreds?.id}`}>
+                        <Link to={`/profile/${commnetPosterCreds?.username}`}>
                             <p className="font-bold hover:underline">{commnetPosterCreds?.display_name}</p>
                         </Link>
                         {commnetPosterCreds?.is_verified && (
                             <VerifiedIcon className="mx-1" />
                         )}
-                        <Link to={`/profile/${commnetPosterCreds?.id}`}>
+                        <Link to={`/profile/${commnetPosterCreds?.username}`}>
                             <p className="text-gray-500 text-sm font-semibold hover:underline">@{commnetPosterCreds?.username}</p>
                         </Link>
                         <p className="text-gray-500 text-sm relative bottom-1 font-bold mx-1">.</p>
