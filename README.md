@@ -22,5 +22,5 @@
 ## Instructions 
 Download the repository either by clicking download or just using git clone.
 
-  git clone https://github.com/lidormaymon/Twitter-Front
+```git clone https://github.com/lidormaymon/Twitter-Front```
 
