@@ -21,6 +21,23 @@
 
 ## Instructions 
 Download the repository either by clicking download or just using git clone.
+	
+	git clone https://github.com/lidormaymon/Twitter-Front
+ 
+Once the clone is done and you have it, you'll have to navigate to the folder by using it.
+	
+	cd Twitter-Front
 
-```git clone https://github.com/lidormaymon/Twitter-Front```
+You then have to install all the indenpcides that have been used.
 
+	npm i --force
+
+ Keep in mind you must  --force in order to make it work.
+
+ Once it's finished as well you can navigate to the src folder by using.
+
+ 	cd src
+
+And then running the app by simply using.
+
+	npm start
