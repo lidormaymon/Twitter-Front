@@ -1,4 +1,4 @@
-# React Twitter Front <hr>
+# React Twitter Front 
 
 <p>This is the fronted code of my Twitter clone project, to use the backend you can find it here https://github.com/lidormaymon/Twitter-Back </p>
 
