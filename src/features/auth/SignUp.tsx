@@ -51,7 +51,7 @@ const SignUp = () => {
   const signUp = async () => {
     setErrorMessage(false)
     setuserNameError(false)
-    const existUser = users.find((user) => user.username, signUpData.username) // Searching through all users exist even tho backend sends error because when i try to access
+    const existUser = users.find((user) => user.username === signUpData.username) // Searching through all users exist even tho backend sends error because when i try to access
     if (!existUser) {                                                          //response.error i recieve an error and cant access it so appraoching that way so user would
       if (signUpData.username.trim() !== '' &&                                 //still recieve an error message
         signUpData.display_name.trim() !== '' &&
