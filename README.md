@@ -1,6 +1,8 @@
 # React Twitter Front 
 
 <p>This is the fronted code of my Twitter clone project, to use the backend you can find it here https://github.com/lidormaymon/Twitter-Back </p>
+<p>The link for the deployed web https://twitter-clone-project-1.netlify.app/</p>
+
 
 ## Features:
 <ul>
